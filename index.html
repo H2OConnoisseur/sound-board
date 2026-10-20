@@ -66,7 +66,8 @@ textarea{min-height:92px;resize:vertical}
 .slot{min-width:54px;height:58px;border-radius:14px;border:3px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;padding:0 8px;box-sizing:border-box}
 .slot.cur{border-color:var(--acc)}
 .slot.ok{border:3px solid transparent;background:var(--c3);color:var(--tk)}
-.tile:disabled{opacity:.2;box-shadow:none;cursor:default}
+.tile:disabled,.chip:disabled{opacity:.2;box-shadow:none;cursor:default}
+.slot.sil{opacity:.35;border-style:solid;border-color:transparent}
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
 .bad{animation:shake .35s}
 .words{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
@@ -129,12 +130,14 @@ function arpa2ids(p){const raw=p.split(' '),t=raw.map(x=>x.replace(/[0-9]/g,''))
 const LONG={a:'ay',e:'ee',i:'igh',o:'oh',u:'ooL'},G3=['tch','dge','igh','air','ear'],G2=['ch','sh','th','ph','wh','ck','ng','qu','kn','wr','gn','mb','ai','ay','ee','ea','oa','ow','oo','ou','oi','oy','au','aw','ie','ew','ue','ar','or','er','ir','ur'];
 const firstOf=(map,k)=>map[k].split(',')[0].split(':')[0];
 /* spelling-rule guess for words that aren't in the dictionary */
-function g2p(word){let w=word.toLowerCase().replace(/[^a-z]/g,''),long=-1;if(w.length>2&&/[aeiou][^aeiouy]e$/.test(w)){long=w.length-3;w=w.slice(0,-1)}
-  const o=[];for(let i=0;i<w.length;){const c=w[i];if(i===long){o.push(LONG[c]);i++;continue}let k=null;for(const g of G3)if(w.startsWith(g,i)){k=g;break}if(!k)for(const g of G2)if(w.startsWith(g,i)){k=g;break}
-    if(k){o.push(...firstOf(PR,k).split('+'));i+=k.length;continue}
-    if(i>0&&c===w[i-1]&&!'aeiou'.includes(c)){i++;continue}
-    if(c=='y'&&i==w.length-1&&w.length>2){o.push('ee');i++;continue}
-    if(L[c])o.push(...firstOf(L,c).split('+'));i++}return o}
+function segGreedy(word){let w=word.toLowerCase().replace(/[^a-z]/g,''),long=-1,silentE=false;if(w.length>2&&/[aeiou][^aeiouy]e$/.test(w)){long=w.length-3;w=w.slice(0,-1);silentE=true}
+  const o=[];for(let i=0;i<w.length;){const c=w[i];if(i===long){o.push({text:c,tile:c,sounds:[LONG[c]]});i++;continue}let k=null;for(const g of G3)if(w.startsWith(g,i)){k=g;break}if(!k)for(const g of G2)if(w.startsWith(g,i)){k=g;break}
+    if(k){o.push({text:k,tile:k,sounds:firstOf(PR,k).split('+')});i+=k.length;continue}
+    if(i>0&&c===w[i-1]&&!'aeiou'.includes(c)&&o.length){o[o.length-1].text+=c;i++;continue}
+    if(c=='y'&&i==w.length-1&&w.length>2){o.push({text:c,tile:c,sounds:['ee']});i++;continue}
+    if(L[c])o.push({text:c,tile:c,sounds:firstOf(L,c).split('+')});i++}
+  if(silentE)o.push({text:'e',tile:'e',sounds:[],silent:true});return o}
+const g2p=word=>segGreedy(word).flatMap(s=>s.sounds);
 let DICT=null,FREQ=null,dataP=null,dataState='idle';
 function wordIds(raw){const w=raw.toLowerCase().replace(/[^a-z']/g,'').replace(/^'+|'+$/g,'');if(!w)return{ids:[],guess:false};
   const c=DICT&&DICT.get(w);if(c)return{ids:[...c].map(ch=>BYCODE[ch]),guess:false};
@@ -329,44 +332,92 @@ const startList=(list,lo)=>{setupList=list.map(r=>r[0]);lettersOnly=lo;step=0;ph
 /* ---------- build a word ---------- */
 const modes=a=>`<div class="tabs modes">${[['main','Sound board'],['build','Build a word'],['read','Read aloud']].map(([v,t])=>`<button class="b ${a==v?'on':''}" data-go="${v}">${t}</button>`).join('')}</div>`;
 const hdr=t=>`<header><h1>${t}</h1><nav><button class="b" data-go="edit">Edit</button><button class="b" data-go="set">Settings</button></nav></header>`;
-let bw={word:'',diff:'easy',started:false,ids:[],guess:false,pos:0,got:[],mist:0,done:false,bad:null,msg:''};
+/* each letter (or letter pair) of the word has to be pressed; letters with several sounds need the right one */
+const BM=Object.assign({},L,PR);
+const EXTRA={a:['or','schwa'],e:['schwa'],i:['schwa'],o:['schwa','u'],u:['schwa','y+ooL'],y:['schwa'],s:['sh','zh'],c:['sh'],g:['zh'],t:['sh','ch'],d:['j'],x:['g+z'],ou:['u','ooS','schwa'],er:['schwa'],or:['schwa'],ar:['schwa'],ai:['e'],ea:['ay']};
+/* lines the letters of a word up with the sounds the dictionary gives for it */
+function align(w,P){
+  const n=w.length,m=P.length,Pc=P.map(canon),INF=1e9,dp=[],bk=[];
+  for(let i=0;i<=n;i++){dp.push(Array(m+1).fill(INF));bk.push(Array(m+1).fill(null))}
+  dp[0][0]=0;
+  const relax=(i,j,c,rec)=>{if(c<dp[i][j]-1e-9){dp[i][j]=c;bk[i][j]=rec}};
+  for(let i=0;i<n;i++)for(let j=0;j<=m;j++){const c0=dp[i][j];if(c0>=INF)continue;
+    const cands=[];
+    for(let len=Math.min(3,n-i);len>=1;len--){const key=w.substr(i,len);if(BM[key])cands.push({key,len,text:key})}
+    if(i+1<n&&w[i]==w[i+1]&&!'aeiou'.includes(w[i])&&BM[w[i]])cands.push({key:w[i],len:2,text:w[i]+w[i]});
+    for(const cd of cands){
+      const vs=BM[cd.key].split(',').map(x=>[x.split(':')[0],0]).concat((EXTRA[cd.key]||[]).map(x=>[x,.5]));
+      for(const[vid,vc]of vs){const seq=vid.split('+').map(canon);let ok=j+seq.length<=m;for(let t=0;ok&&t<seq.length;t++)if(Pc[j+t]!=seq[t])ok=false;
+        if(ok)relax(i+cd.len,j+seq.length,c0+vc+.01,{pi:i,pj:j,cd,sounds:P.slice(j,j+seq.length)})}
+      for(const k of[1,2])if(j+k<=m)relax(i+cd.len,j+k,c0+(k==1?4:4.5)+.01,{pi:i,pj:j,cd,sounds:P.slice(j,j+k)});
+      if(cd.len==1)relax(i+1,j,c0+(cd.key=='e'?2.5:3),{pi:i,pj:j,cd,sounds:[],silent:true})}}
+  if(dp[n][m]>=INF)return null;
+  const segs=[];let i=n,j=m;while(i>0||j>0){const r=bk[i][j];if(!r)return null;segs.unshift({text:r.cd.text,tile:r.cd.key,sounds:r.sounds,silent:!!r.silent});i=r.pi;j=r.pj}
+  return segs;
+}
+function finishSegs(segs,forceIrr){segs.forEach(s=>{s.key=s.sounds.map(canon).join('+');const bk=BM[s.tile].split(',').map(x=>x.split(':')[0].split('+').map(canon).join('+'));s.irregular=!s.silent&&(!!forceIrr||!bk.includes(s.key))});return segs}
+function wordSegs(raw){
+  const w=raw.toLowerCase().replace(/[^a-z]/g,'');if(!w)return{segs:[],guess:false};
+  const r=wordIds(raw);
+  if(!r.guess){const segs=align(w,r.ids);if(segs)return{segs:finishSegs(segs),guess:false};return{segs:finishSegs(segGreedy(w),true),guess:false}}
+  return{segs:finishSegs(segGreedy(w)),guess:true};
+}
+const nextPos=(segs,p)=>{while(p<segs.length&&segs[p].silent)p++;return p};
+let bw={word:'',diff:'easy',started:false,segs:[],guess:false,pos:0,mist:0,done:false,bad:null,msg:'',tab:'l'};
+function gTile(key,map,label,cls,en){
+  const v=variants(key,map);if(!v.length)return '';const dis=en?'':'disabled';
+  let h=`<div class="g"><button class="tile ${cls} ${bw.bad==key+'|'+v[0][0]?'bad':''}" data-bwp="${key}|${v[0][0]}" ${dis}>${label}<small>${v[0][1]}</small></button>`;
+  if(v.length>1)h+=`<div class="chips">${v.slice(1).map(x=>`<button class="chip ${cls} ${bw.bad==key+'|'+x[0]?'bad':''}" data-bwp="${key}|${x[0]}" ${dis}>${lab(x[0])}<small>${x[1]}</small></button>`).join('')}</div>`;
+  return h+'</div>';
+}
 function rBuild(){
   let h=hdr('Sound Board')+modes('build');
   if(!bw.started){
-    h+=`<div class="card"><b>Build a word</b><div class="msg">Type a word, pick a level, then press the sounds in the right order.</div>
+    h+=`<div class="card"><b>Build a word</b><div class="msg">Type a word, pick a level, then press its letters in order. If a letter has more than one sound, pick the right one.</div>
     <input id="bwi" type="text" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Type a word, like cat" value="${esc(bw.word)}">
-    <div class="lv" style="margin-top:10px">${[['easy','Easy','Only the next sound lights up'],['mid','Medium','Pick the right sounds, in order'],['hard','Hard','Every sound is there']].map(([d,t,s])=>`<button class="b ${bw.diff==d?'p':''}" data-diff="${d}">${t}<small>${s}</small></button>`).join('')}</div>
+    <div class="lv" style="margin-top:10px">${[['easy','Easy','Only the next letter lights up'],['mid','Medium','Only this word’s letters light up. Pick them in order'],['hard','Hard','Every letter is there']].map(([d,t,s])=>`<button class="b ${bw.diff==d?'p':''}" data-diff="${d}">${t}<small>${s}</small></button>`).join('')}</div>
     <div class="row"><button class="b p bigb" data-bwstart>Start</button></div><div class="msg">${esc(bw.msg||'')}</div></div>`;
   }else{
-    const want=bw.ids[bw.pos];
-    const en=id=>{if(bw.done)return false;if(bw.diff=='hard')return true;if(bw.diff=='easy')return canon(id)==canon(want);return bw.ids.some(x=>canon(x)==canon(id))};
-    h+=`<div class="card"><div class="bigw">${esc(bw.word)}</div><div class="slots">${bw.ids.map((id,i)=>`<span class="slot ${i<bw.pos?'ok':(i==bw.pos&&!bw.done?'cur':'')}">${i<bw.pos?lab(bw.ids[i]):'?'}</span>`).join('')}</div>
-    <div class="msg" style="text-align:center">${bw.done?'':esc(bw.msg||'Press the sounds in order.')}</div>
+    const cur=bw.segs[bw.pos],tiles=new Set(bw.segs.filter(s=>!s.silent).map(s=>s.tile));
+    const en=k=>{if(bw.done)return false;if(bw.diff=='hard')return true;if(bw.diff=='easy')return cur&&k==cur.tile;return tiles.has(k)};
+    const dot=keys=>bw.diff=='mid'&&!bw.done&&keys.some(k=>tiles.has(k))?' ●':'';
+    h+=`<div class="card"><div class="bigw">${esc(bw.word)}</div><div class="slots">${bw.segs.map((s,i)=>s.silent?`<span class="slot sil">${esc(s.text)}</span>`:`<span class="slot ${i<bw.pos?'ok':(i==bw.pos&&!bw.done?'cur':'')}">${i<bw.pos?esc(s.text):'?'}</span>`).join('')}</div>
+    <div class="msg" style="text-align:center">${bw.done?'':esc(bw.msg||'Press the letters in order.')}</div>
     ${bw.guess?'<div class="msg" style="text-align:center;opacity:.7">I wasn’t sure how this word sounds, so this is a best guess.</div>':''}
+    ${bw.segs.some(s=>s.silent)?'<div class="msg" style="text-align:center;opacity:.7">Faded letters are silent, so you can skip them.</div>':''}
     <div class="row" style="justify-content:center"><button class="b" data-bwhear>Hear the word</button><button class="b" data-bwreset>Start over</button><button class="b" data-bwnew>New word</button></div></div>`;
     if(bw.done){const st=bw.mist==0?3:bw.mist<=2?2:1;h+=`<div class="card" style="text-align:center"><div class="big" style="font-size:56px">${'⭐'.repeat(st)}</div><b>${st==3?'Perfect!':st==2?'Nice work!':'You did it!'}</b><div class="msg">${bw.mist?bw.mist+(bw.mist==1?' wrong press':' wrong presses'):'No wrong presses.'}</div><div class="row" style="justify-content:center"><button class="b" data-bwagain>Hear it blended</button><button class="b p" data-bwnew>New word</button></div></div>`}
-    h+=`<div class="grid">${S.map(r=>{const id=r[0],c=P.includes(id)?'k3':'aeiou'.includes(id)?'k2':'k1';return `<div class="g"><button class="tile ${c} ${bw.bad==id?'bad':''}" data-bwp="${id}" ${en(id)?'':'disabled'}>${r[1]}<small>${r[3]}</small></button></div>`}).join('')}</div>`;
+    h+=`<div class="tabs"><button class="b ${bw.tab=='l'?'on':''}" data-bwtab="l">Letters${dot(Object.keys(L))}</button><button class="b ${bw.tab=='q'?'on':''}" data-bwtab="q">Pairs${dot(Object.keys(PR))}</button></div><div class="grid">`;
+    if(bw.tab=='l')Object.keys(L).forEach(l=>{h+=gTile(l,L,l.toUpperCase()+l,'aeiou'.includes(l)?'k2':'k1',en(l))});
+    else Object.keys(PR).forEach(k=>{h+=gTile(k,PR,k,'k3',en(k))});
+    h+='</div>';
   }
   app.innerHTML=h;
   if(!bw.started&&!bw.word){const i=$('#bwi');if(i)setTimeout(()=>i.focus(),50)}
 }
 async function bwStart(){
   const w=(bw.word||'').toLowerCase().replace(/[^a-z']/g,'').replace(/^'+|'+$/g,'');
-  if(!w){bw.msg='Type a word first.';R();return}
+  if(!w.replace(/'/g,'')){bw.msg='Type a word first.';R();return}
   if(dataState!='ready'){bw.msg='Looking up the word…';R();await loadData()}
-  const r=wordIds(w),miss=[...new Set(r.ids.filter(id=>!(bufFor(id)||cfg.sys)))];
-  if(!r.ids.length){bw.msg='I couldn’t find any sounds in that word.';R();return}
-  if(miss.length){bw.msg='Record these sounds first: '+miss.map(lab).join(', ')+'. You can do that in Edit.';R();return}
-  Object.assign(bw,{word:w,ids:r.ids,guess:r.guess,pos:0,got:[],mist:0,done:false,bad:null,msg:'',started:true});R();
+  const r=wordSegs(w),segs=r.segs,miss=new Set();
+  segs.forEach(s=>{if(s.silent)return;if(s.irregular){if(!variants(s.tile,BM).length)miss.add(s.tile)}else s.sounds.forEach(id=>{if(!(bufFor(id)||cfg.sys))miss.add(lab(id))})});
+  if(!segs.length){bw.msg='I couldn’t find any letters in that.';R();return}
+  if(miss.size){bw.msg='Record these sounds first: '+[...miss].join(', ')+'. You can do that in Edit.';R();return}
+  const pos=nextPos(segs,0);
+  Object.assign(bw,{word:w,segs,guess:r.guess,pos,mist:0,done:false,bad:null,msg:'',started:true,tab:bw.diff=='easy'&&PR[segs[pos].tile]?'q':'l'});R();
 }
-function bwPress(id){
-  if(bw.done)return;play(id);
-  if(canon(id)==canon(bw.ids[bw.pos])){bw.got.push(id);bw.pos++;bw.bad=null;bw.msg='Yes!';
-    if(bw.pos>=bw.ids.length){bw.done=true;R();setTimeout(blendWord,700);return}}
-  else{bw.mist++;bw.bad=id;bw.msg='Not that one. Try again.'}
+function bwPress(v){
+  if(bw.done)return;const[tile,id]=v.split('|');play(id);
+  const seg=bw.segs[bw.pos],pk=id.split('+').map(canon).join('+');
+  if(tile==seg.tile&&(seg.irregular||pk==seg.key)){
+    bw.bad=null;bw.msg=seg.irregular?'Tricky one! That letter sounds different in this word.':'Yes!';
+    bw.pos=nextPos(bw.segs,bw.pos+1);
+    if(bw.pos>=bw.segs.length){bw.done=true;R();setTimeout(blendWord,700);return}
+    if(bw.diff=='easy')bw.tab=PR[bw.segs[bw.pos].tile]?'q':'l';
+  }else{bw.mist++;bw.bad=v;bw.msg=tile==seg.tile?'Right letter! Try a different sound for it.':'Not that one. Try again.'}
   R();
 }
-const blendWord=()=>seqPlay(bw.ids.map(id=>({id,gap:.08,tag:null})));
+const blendWord=()=>seqPlay(bw.segs.flatMap(s=>s.sounds.flatMap(x=>x.split('+'))).map(id=>({id,gap:.08,tag:null})));
 function speakWord(w){if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(w);u.rate=.8;speechSynthesis.speak(u)}
 /* ---------- read aloud ---------- */
 let rd={text:'',words:[],speed:'normal',msg:''};
@@ -425,7 +476,8 @@ app.addEventListener('click',async ev=>{
   else if(D.bwp)bwPress(D.bwp)
   else if(D.bwhear!==undefined)speakWord(bw.word)
   else if(D.bwagain!==undefined)blendWord()
-  else if(D.bwreset!==undefined){Object.assign(bw,{pos:0,got:[],mist:0,done:false,bad:null,msg:''});R()}
+  else if(D.bwreset!==undefined){Object.assign(bw,{pos:nextPos(bw.segs,0),mist:0,done:false,bad:null,msg:''});R()}
+  else if(D.bwtab){bw.tab=D.bwtab;R()}
   else if(D.bwnew!==undefined){Object.assign(bw,{word:'',started:false,done:false,bad:null,msg:''});R()}
   else if(D.speed){rd.speed=D.speed;R()}
   else if(D.rdread!==undefined)rdRead()
