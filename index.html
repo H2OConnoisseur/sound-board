@@ -100,7 +100,9 @@ let bufs={},cfg={done:false,sys:false,prim:{}},view='main',tab='l',step=-1,phase
 
 /* storage (same database and keys as earlier versions, so old recordings still load) */
 const dbp=()=>new Promise((res,rej)=>{try{const r=indexedDB.open('soundboard',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}});
-async function kv(op,k,v){try{const d=await dbp();return await new Promise((res,rej)=>{const t=d.transaction('kv','readwrite').objectStore('kv');const q=op=='get'?t.get(k):op=='set'?t.put(v,k):t.delete(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}catch(e){if(op=='get')return mem.get(k);if(op=='set')mem.set(k,v);else mem.delete(k)}}
+let PID='p1',profs={list:[{id:'p1',name:'Me'}]};
+const pkey=k=>PID=='p1'||!/^(cfg|rec:|raw:|trim:)/.test(k)?k:PID+':'+k;
+async function kv(op,k,v){k=pkey(k);try{const d=await dbp();return await new Promise((res,rej)=>{const t=d.transaction('kv','readwrite').objectStore('kv');const q=op=='get'?t.get(k):op=='set'?t.put(v,k):t.delete(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}catch(e){if(op=='get')return mem.get(k);if(op=='set')mem.set(k,v);else mem.delete(k)}}
 const saveCfg=()=>kv('set','cfg',cfg);
 const delClip=async id=>{await kv('del','rec:'+id);await kv('del','raw:'+id);await kv('del','trim:'+id);delete bufs[id]};
 
@@ -257,7 +259,7 @@ function grp(key,map,label,cls){
   return h+'</div>';
 }
 function rMain(){
-  let h=`<header><h1>Sound Board</h1><nav><button class="b" data-go="edit">Edit</button><button class="b" data-go="set">Settings</button></nav></header>${modes('main')}<div class="tabs"><button class="b ${tab=='l'?'on':''}" data-tab="l">Letters</button><button class="b ${tab=='q'?'on':''}" data-tab="q">Pairs</button><button class="b ${tab=='p'?'on':''}" data-tab="p">Sounds</button></div><div class="grid">`;
+  let h=`<header><h1>Sound Board</h1><nav>${who()}<button class="b" data-go="edit">Edit</button><button class="b" data-go="set">Settings</button></nav></header>${modes('main')}<div class="tabs"><button class="b ${tab=='l'?'on':''}" data-tab="l">Letters</button><button class="b ${tab=='q'?'on':''}" data-tab="q">Pairs</button><button class="b ${tab=='p'?'on':''}" data-tab="p">Sounds</button></div><div class="grid">`;
   let n=0;
   if(tab=='l')Object.keys(L).forEach(l=>{const g=grp(l,L,l.toUpperCase()+l,'aeiou'.includes(l)?'k2':'k1');if(g){n++;h+=g}});
   else if(tab=='q')Object.keys(PR).forEach(k=>{const g=grp(k,PR,k,'k3');if(g){n++;h+=g}});
@@ -275,9 +277,38 @@ function rEdit(){
 }
 function rSet(){
   app.innerHTML=`<header><h1>Settings</h1><nav><button class="b" data-go="main">Done</button></nav></header>
+  ${profCard()}
   <div class="card sw"><div><b>Use device voice</b><div class="msg">Sounds you haven’t recorded use the iPad’s built-in voice. It’s only a rough match for letter sounds.</div></div><button class="b ${cfg.sys?'p':''}" data-sys>${cfg.sys?'On':'Off'}</button></div>
   <div class="card"><b>Back up recordings</b><div class="msg">Saves all your recordings to one file. Keep it somewhere safe, such as Files or iCloud Drive. If the iPad ever clears Safari’s data, restore from it.</div><div class="row"><button class="b" data-backup>Save backup file</button><button class="b" data-restore>Restore from backup</button><input type="file" id="rf" accept=".json,application/json" hidden></div><div class="msg" id="bm"></div></div>
   <div class="card ${confirmReset?'warn':''}"><b>Redo setup</b><div class="msg">${confirmReset?'This deletes all your recordings and starts the welcome steps again.':'Start the recording steps over from the beginning.'}</div><div class="row">${confirmReset?'<button class="b" data-cancel>Cancel</button><button class="b p" data-reset>Delete and restart</button>':'<button class="b" data-ask>Redo setup…</button>'}</div></div>`;
+}
+/* ---------- profiles: each child has their own recordings and settings ---------- */
+let delAsk=null,pmsg='';
+const profCard=()=>`<div class="card"><b>Profiles</b><div class="msg">Each child has their own recordings and settings. ${profs.list.length>1?'The sound board asks who is playing when it opens.':''}</div>
+  ${profs.list.map(p=>`<div class="row" style="align-items:center"><input type="text" style="flex:1;min-width:120px;font-size:18px" value="${esc(p.name)}" data-pname="${p.id}" aria-label="Name">${p.id==PID?'<span class="msg">Playing now</span>':`<button class="b" data-pick="${p.id}">Switch</button>`}${profs.list.length>1?(delAsk==p.id?`<button class="b p" data-pdel="${p.id}">Delete ${esc(p.name)}'s recordings</button><button class="b" data-pno>Cancel</button>`:`<button class="b" data-pask="${p.id}">Delete</button>`):''}</div>`).join('')}
+  <div class="row"><input type="text" id="pnew" style="flex:1;min-width:120px;font-size:18px" placeholder="Add a child, like Maya" autocapitalize="words"><button class="b p" data-padd>Add</button></div><div class="msg">${esc(pmsg)}</div></div>`;
+const saveProfs=()=>kv('set','profiles',profs);
+async function loadProfile(id){
+  stopSeq();stopMic();PID=id;profs.cur=id;await saveProfs();
+  bufs={};cfg={done:false,sys:false,prim:{}};
+  const c=await kv('get','cfg');if(c)cfg=Object.assign(cfg,c);
+  for(const r of S){const ab=await kv('get','rec:'+r[0]);if(ab)try{bufs[r[0]]=await ac().decodeAudioData(ab.slice(0))}catch(e){}}
+  Object.assign(bw,{started:false,word:'',done:false,bad:null,msg:''});rd.words=[];rd.msg='';lastRec=null;lastPct=0;hf=false;sel=null;confirmReset=false;
+  view=cfg.done?'main':'setup';phase='start';step=-1;R();
+}
+function rWho(){
+  app.innerHTML=`<h1>Who\u2019s playing?</h1><div class="grid" style="margin-top:14px">${profs.list.map((p,i)=>`<div class="g"><button class="tile k${i%3+1}" data-pick="${p.id}" style="font-size:30px;min-height:120px;word-break:break-word">${esc(p.name)}</button></div>`).join('')}</div>
+  <div class="card"><b>Add a child</b><div class="row"><input type="text" id="pnew" style="flex:1;min-width:140px" placeholder="Name" autocapitalize="words"><button class="b p" data-padd>Add</button></div><div class="msg">${esc(pmsg)}</div></div>`;
+}
+async function addProfile(){
+  const el=$('#pnew'),nm=(el&&el.value||'').trim().slice(0,24);if(!nm){pmsg='Type a name first.';R();return}
+  const id='u'+Date.now().toString(36);profs.list.push({id,name:nm});pmsg='';await saveProfs();await loadProfile(id);
+}
+async function delProfile(id){
+  if(profs.list.length<2)return;
+  const old=PID;PID=id;for(const r of S)await delClip(r[0]);await kv('del','cfg');PID=old;
+  profs.list=profs.list.filter(p=>p.id!=id);delAsk=null;await saveProfs();
+  if(id==PID)await loadProfile(profs.list[0].id);else R();
 }
 async function backup(){
   const o={v:1,clips:{}};
@@ -325,13 +356,15 @@ async function runCard(){
   setTimeout(()=>{if(tok===cardTok)advance()},700);
 }
 function advance(){if(step>=setupList.length-1){if(lettersOnly){phase='mid';R()}else finish(false)}else{step++;R()}}
-function R(){if(view!='setup'){cardTok++;if(curCap){curCap.stop();curCap=null}}if(view!='build'&&view!='read')stopSeq();({main:rMain,edit:rEdit,set:rSet,setup:rSetup,build:rBuild,read:rRead})[view]();if(view!='edit'&&view!='setup')stopMic();scrollTo(0,0)}
+function R(){if(view!='setup'){cardTok++;if(curCap){curCap.stop();curCap=null}}if(view!='build'&&view!='read')stopSeq();({main:rMain,edit:rEdit,set:rSet,setup:rSetup,build:rBuild,read:rRead,who:rWho})[view]();if(view!='edit'&&view!='setup')stopMic();scrollTo(0,0)}
 async function finish(sys){cfg.done=true;if(sys)cfg.sys=true;await saveCfg();view='main';R()}
 const startList=(list,lo)=>{setupList=list.map(r=>r[0]);lettersOnly=lo;step=0;phase='card';lastPct=0;R()};
 
 /* ---------- build a word ---------- */
 const modes=a=>`<div class="tabs modes">${[['main','Sound board'],['build','Build a word'],['read','Read aloud']].map(([v,t])=>`<button class="b ${a==v?'on':''}" data-go="${v}">${t}</button>`).join('')}</div>`;
-const hdr=t=>`<header><h1>${t}</h1><nav><button class="b" data-go="edit">Edit</button><button class="b" data-go="set">Settings</button></nav></header>`;
+const who=()=>profs.list.length>1?`<button class="b" data-who>👤 ${esc(curName())} ▾</button>`:'';
+const curName=()=>(profs.list.find(p=>p.id==PID)||profs.list[0]).name;
+const hdr=t=>`<header><h1>${t}</h1><nav>${who()}<button class="b" data-go="edit">Edit</button><button class="b" data-go="set">Settings</button></nav></header>`;
 /* each letter (or letter pair) of the word has to be pressed; letters with several sounds need the right one */
 const BM=Object.assign({},L,PR);
 const EXTRA={a:['or','schwa'],e:['schwa'],i:['schwa'],o:['schwa','u'],u:['schwa','y+ooL'],y:['schwa'],s:['sh','zh'],c:['sh'],g:['zh'],t:['sh','ch'],d:['j'],x:['g+z'],ou:['u','ooS','schwa'],er:['schwa'],or:['schwa'],ar:['schwa'],ai:['e'],ea:['ay']};
@@ -450,7 +483,8 @@ app.addEventListener('contextmenu',ev=>{ev.preventDefault();const t=ev.target.cl
 async function swap(v){const[k,id]=v.split('|');cfg.prim=cfg.prim||{};cfg.prim[k]=id;await saveCfg();R()}
 app.addEventListener('input',ev=>{if(ev.target.id=='bwi')bw.word=ev.target.value;else if(ev.target.id=='rdi')rd.text=ev.target.value});
 app.addEventListener('keydown',ev=>{if(ev.key=='Enter'&&ev.target.id=='bwi'){ev.preventDefault();bwStart()}});
-app.addEventListener('change',ev=>{if(ev.target.id=='rf'&&ev.target.files[0]){restore(ev.target.files[0]);ev.target.value=''}});
+app.addEventListener('change',ev=>{if(ev.target.dataset&&ev.target.dataset.pname){const p=profs.list.find(x=>x.id==ev.target.dataset.pname),v=ev.target.value.trim().slice(0,24);if(p&&v){p.name=v;saveProfs()}return}
+  if(ev.target.id=='rf'&&ev.target.files[0]){restore(ev.target.files[0]);ev.target.value=''}});
 app.addEventListener('click',async ev=>{
   const t=ev.target.closest('button');if(!t)return;const D=t.dataset;
   try{ac()}catch(e){} /* Safari only unlocks audio from a tap */
@@ -479,6 +513,12 @@ app.addEventListener('click',async ev=>{
   else if(D.bwagain!==undefined)blendWord()
   else if(D.bwreset!==undefined){Object.assign(bw,{pos:nextPos(bw.segs,0),mist:0,done:false,bad:null,msg:''});R()}
   else if(D.bwtab){bw.tab=D.bwtab;R()}
+  else if(D.who!==undefined){view='who';pmsg='';R()}
+  else if(D.pick){await loadProfile(D.pick)}
+  else if(D.padd!==undefined)addProfile()
+  else if(D.pask){delAsk=D.pask;R()}
+  else if(D.pno!==undefined){delAsk=null;R()}
+  else if(D.pdel)delProfile(D.pdel)
   else if(D.bwnew!==undefined){Object.assign(bw,{word:'',started:false,done:false,bad:null,msg:''});R()}
   else if(D.speed){rd.speed=D.speed;R()}
   else if(D.rdread!==undefined)rdRead()
@@ -488,10 +528,10 @@ app.addEventListener('click',async ev=>{
   else if(D.prev!==undefined){if(step>0){step--;R()}else{phase='start';R()}}
 });
 (async()=>{
-  const c=await kv('get','cfg');if(c)cfg=Object.assign({done:false,sys:false,prim:{}},c);
-  for(const r of S){const ab=await kv('get','rec:'+r[0]);if(ab)try{bufs[r[0]]=await ac().decodeAudioData(ab.slice(0))}catch(e){}}
+  const pf=await kv('get','profiles');if(pf&&pf.list&&pf.list.length)profs=pf;
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
-  view=cfg.done?'main':'setup';phase='start';R();
+  if(profs.list.length>1){view='who';R();return}
+  await loadProfile(profs.list[0].id);
 })();
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script></body></html>
