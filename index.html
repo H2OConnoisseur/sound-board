@@ -74,8 +74,8 @@ textarea{min-height:92px;resize:vertical}
 .wd{display:inline-flex;flex-direction:column;align-items:center;gap:4px;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:8px 10px}
 .wd.guess{border-style:dashed}
 .wd .wt{font-size:15px;opacity:.7}
-.sc{display:inline-block;min-width:28px;text-align:center;border-radius:10px;padding:1px 6px;background:var(--c1);color:var(--tk);font-weight:700;font-size:22px;margin:0 2px;transition:transform .1s}
-.sc.now{background:var(--acc);color:#fff;transform:scale(1.25)}
+.sc{display:inline-block;min-width:28px;text-align:center;border-radius:10px;padding:1px 6px;color:var(--tk);font-weight:700;font-size:22px;margin:0 2px;transition:transform .1s}
+.sc.now{background:var(--acc)!important;color:#fff;transform:scale(1.25)}
 .rk{margin:2px 0 10px}
 .trk{position:relative;height:12px;border-radius:8px;background:var(--line);margin:26px 18px 8px}
 .trk i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:linear-gradient(90deg,var(--c3),var(--c1),var(--c2));transition:width .9s ease}
@@ -420,13 +420,14 @@ function bwPress(v){
 const blendWord=()=>seqPlay(bw.segs.flatMap(s=>s.sounds.flatMap(x=>x.split('+'))).map(id=>({id,gap:.08,tag:null})));
 function speakWord(w){if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(w);u.rate=.8;speechSynthesis.speak(u)}
 /* ---------- read aloud ---------- */
+const sck=id=>{const l=lab(id);return l.length>1?'k3':'aeiou'.includes(l)||id=='schwa'?'k2':'k1'};
 let rd={text:'',words:[],speed:'normal',msg:''};
 function rRead(){
   let h=hdr('Sound Board')+modes('read');
   h+=`<div class="card"><b>Read aloud</b><div class="msg">Type a sentence. It splits each word into sounds and plays them with your recordings.</div><textarea id="rdi" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="The cat sat on the mat.">${esc(rd.text)}</textarea>
   <div class="row">${[['slow','Slow'],['normal','Normal'],['fast','Fast']].map(([s,t])=>`<button class="b ${rd.speed==s?'p':''}" data-speed="${s}">${t}</button>`).join('')}</div>
   <div class="row"><button class="b p bigb" data-rdread>Read it</button><button class="b" data-rdstop>Stop</button></div><div class="msg">${esc(rd.msg||'')}</div></div>`;
-  if(rd.words.length)h+=`<div class="words">${rd.words.map((x,i)=>`<button class="wd ${x.guess?'guess':''}" data-rdword="${i}"><span class="wt">${esc(x.w)}</span><span>${x.ids.map((id,j)=>`<span class="sc" data-w="${i}" data-s="${j}">${lab(id)}</span>`).join('')}</span></button>`).join('')}</div><p class="msg">Tap a word to hear just that word. A dashed outline means I guessed how it sounds.</p>`;
+  if(rd.words.length)h+=`<div class="words">${rd.words.map((x,i)=>`<button class="wd ${x.guess?'guess':''}" data-rdword="${i}"><span class="wt">${esc(x.w)}</span><span>${x.ids.map((id,j)=>`<span class="sc ${sck(id)}" data-w="${i}" data-s="${j}">${lab(id)}</span>`).join('')}</span></button>`).join('')}</div><p class="msg">Tap a word to hear just that word. A dashed outline means I guessed how it sounds.</p>`;
   app.innerHTML=h;
 }
 const GAPS={slow:[.5,1],normal:[.2,.55],fast:[.03,.35]};
