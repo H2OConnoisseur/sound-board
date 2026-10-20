@@ -87,7 +87,7 @@ textarea{min-height:92px;resize:vertical}
 <div id="app"></div>
 <script>
 /* id | label | device-voice text | example word */
-const S=`b|b|buh|ball;d|d|duh|dog;f|f|fuh|fan;g|g|guh|goat;h|h|huh|hat;j|j|juh|jam;k|k|kuh|kite;l|l|luh|leg;m|m|muh|mop;n|n|nuh|nut;p|p|puh|pig;r|r|ruh|red;s|s|suh|sun;t|t|tuh|top;v|v|vuh|van;w|w|wuh|web;y|y|yuh|yes;z|z|zuh|zip;a|a|ah|apple;e|e|eh|egg;i|i|ih|igloo;o|o|ah|octopus;u|u|uh|umbrella;ch|ch|chuh|chip;sh|sh|shuh|ship;th|th|thuh|thin;dh|th|thuh|this;zh|zh|zhuh|vision;ng|ng|ing|ring;ay|ai|A|rain;ee|ee|E|bee;igh|igh|eye|night;oh|oa|oh|boat;ooL|oo|ooh|moon;ooS|oo|uh|book;ar|ar|are|car;or|or|or|fork;air|air|air|chair;ur|ur|err|bird;ow|ow|ow|cow;oi|oi|oy|coin;ear|ear|ear|deer;ure|ure|your|pure;schwa|uh|uh|about`.split(';').map(x=>x.split('|'));
+const S=`b|b|buh|ball;d|d|duh|dog;f|f|fuh|fan;g|g|guh|goat;h|h|huh|hat;j|j|juh|jam;k|k|kuh|kite;l|l|luh|leg;m|m|muh|mop;n|n|nuh|nut;p|p|puh|pig;r|r|ruh|red;s|s|suh|sun;t|t|tuh|top;v|v|vuh|van;w|w|wuh|web;y|y|yuh|yes;z|z|zuh|zip;a|a|ah|apple;e|e|eh|egg;i|i|ih|igloo;o|o|ah|octopus;u|u|uh|umbrella;ch|ch|chuh|chip;sh|sh|shuh|ship;th|th|thuh|thin;dh|th|thuh|this;zh|zh|zhuh|vision;ng|ng|ing|ring;ay|ai|A|rain;ee|ee|E|bee;igh|igh|eye|night;oh|oa|oh|boat;ooL|oo|ooh|moon;ooS|oo|uh|book;ar|ar|are|car;or|or|or|fork;air|air|air|chair;ur|ur|err|bird;ow|ow|ow|cow;oi|oi|oy|coin;ear|ear|ear|deer;ure|ure|your|pure;schwa|ə|uh|about`.split(';').map(x=>x.split('|'));
 const SD={};S.forEach(r=>SD[r[0]]=r);
 const NL=23; /* first 23 entries are the single letters */
 const P=S.slice(NL).map(r=>r[0]);
@@ -119,14 +119,13 @@ function drawThumb(c,b){const g=c.getContext('2d'),W=c.width,H=c.height;g.clearR
 /* ---------- word data: fetched once from a public CDN, then kept on the device ---------- */
 const CHS='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqr'; /* one character per sound */
 const CODE={},BYCODE={};S.forEach((r,i)=>{CODE[r[0]]=CHS[i];BYCODE[CHS[i]]=r[0]});
-CODE.schwa=CODE.u; /* the two "uh" sounds count as one */
-const canon=id=>id=='schwa'?'u':id;
+const canon=id=>id=='schwa'?'u':id; /* the two "uh" sounds count as the same when pressing buttons */
 const bufFor=id=>bufs[id]||(id=='u'?bufs.schwa:id=='schwa'?bufs.u:null);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const CONS={B:'b',CH:'ch',D:'d',DH:'dh',F:'f',G:'g',HH:'h',JH:'j',K:'k',L:'l',M:'m',N:'n',NG:'ng',P:'p',R:'r',S:'s',SH:'sh',T:'t',TH:'th',V:'v',W:'w',Y:'y',Z:'z',ZH:'zh'};
 const V1={AA:'o',AE:'a',AH:'u',AO:'or',AW:'ow',AY:'igh',EH:'e',EY:'ay',IH:'i',IY:'ee',OW:'oh',OY:'oi',UH:'ooS',UW:'ooL',ER:'ur'};
 const VR={AA:'ar',AO:'or',EH:'air',IH:'ear',UH:'ure'};
-function arpa2ids(p){const t=p.split(' ').map(x=>x.replace(/[0-9]/g,'')),o=[];for(let i=0;i<t.length;i++){const x=t[i],nx=t[i+1],nn=t[i+2];if(VR[x]&&nx=='R'&&(!nn||!(nn in V1))){o.push(VR[x]);i++}else if(V1[x])o.push(V1[x]);else if(CONS[x])o.push(CONS[x]);else return[]}return o}
+function arpa2ids(p){const raw=p.split(' '),t=raw.map(x=>x.replace(/[0-9]/g,'')),o=[];for(let i=0;i<t.length;i++){const x=t[i],nx=t[i+1],nn=t[i+2];if(VR[x]&&nx=='R'&&(!nn||!(nn in V1))){o.push(VR[x]);i++}else if(x=='AH')o.push(raw[i]=='AH0'?'schwa':'u');else if(V1[x])o.push(V1[x]);else if(CONS[x])o.push(CONS[x]);else return[]}return o}
 const LONG={a:'ay',e:'ee',i:'igh',o:'oh',u:'ooL'},G3=['tch','dge','igh','air','ear'],G2=['ch','sh','th','ph','wh','ck','ng','qu','kn','wr','gn','mb','ai','ay','ee','ea','oa','ow','oo','ou','oi','oy','au','aw','ie','ew','ue','ar','or','er','ir','ur'];
 const firstOf=(map,k)=>map[k].split(',')[0].split(':')[0];
 /* spelling-rule guess for words that aren't in the dictionary */
@@ -146,10 +145,10 @@ function loadData(){
   if(dataP)return dataP;dataState='loading';
   dataP=(async()=>{
     try{
-      let dt=await kv('get','dict2');
-      if(!dt){const m=await import('https://cdn.jsdelivr.net/npm/cmu-pronouncing-dictionary@3.0.0/index.js'),lines=[];
+      let dt=await kv('get','dict3');
+      if(!dt){kv('del','dict2');const m=await import('https://cdn.jsdelivr.net/npm/cmu-pronouncing-dictionary@3.0.0/index.js'),lines=[];
         for(const w in m.dictionary){if(!/^[a-z']+$/.test(w))continue;const ids=arpa2ids(m.dictionary[w]);if(ids.length)lines.push(w+' '+ids.map(i=>CODE[i]).join(''))}
-        dt=lines.join('\n');await kv('set','dict2',dt)}
+        dt=lines.join('\n');await kv('set','dict3',dt)}
       DICT=new Map();for(const l of dt.split('\n')){const i=l.indexOf(' ');if(i>0)DICT.set(l.slice(0,i),l.slice(i+1))}
       dataState='ready';
       try{let fq=await kv('get','freq2');if(!fq){const r=await fetch('https://cdn.jsdelivr.net/gh/first20hours/google-10000-english@master/google-10000-english-no-swears.txt');if(!r.ok)throw 0;fq=await r.text();await kv('set','freq2',fq)}
@@ -162,14 +161,14 @@ function loadData(){
 /* ---------- rocket facts ---------- */
 const TRIV=['English has about 44 sounds but only 26 letters, so some sounds need two letters together, like “sh”.','The “uh” sound is the most common sound in English. It hides in words like “about” and “banana”.','“th” makes two different sounds: a soft one in “thin” and a buzzy one in “this”.','The letters c, q and x don’t have sounds of their own. They borrow from k, s and “kw”.','“e” is the most common letter in English words.','Blending is sliding sounds together to make a word. You’re collecting the building blocks right now!','The letters “ough” can be said many ways: though, through, tough, cough, thought.'];
 let lastRec=null,factTick=0,lastPct=0;
-const recSet=()=>{const s=new Set();for(const id in bufs)s.add(CODE[id]);return s};
+const recSet=()=>{const s=new Set();for(const id in bufs)s.add(CODE[id]);if(s.has(CODE.u)||s.has(CODE.schwa)){s.add(CODE.u);s.add(CODE.schwa)}return s};
 const canBuild=(set,x)=>{for(let i=0;i<x.c.length;i++)if(!set.has(x.c[i]))return false;return true};
 const pc=x=>x<.005?'less than 1%':'about '+Math.round(x*100)+'%';
 function factText(just){
   const set=recSet(),dyn=[];
   if(FREQ&&set.size){
     let ok=0;for(const x of FREQ)if(canBuild(set,x))ok+=x.f;
-    if(just){const j=CODE[just],set2=new Set(set);set2.delete(j);const nw=[];for(const x of FREQ){if(nw.length>=3)break;if(x.w.length>1&&x.c.includes(j)&&canBuild(set,x))nw.push(x.w)}
+    if(just){const j=CODE[just],eq=just=='u'||just=='schwa',nw=[];if(!eq)for(const x of FREQ){if(nw.length>=3)break;if(x.w.length>1&&x.c.includes(j)&&canBuild(set,x))nw.push(x.w)}
       if(nw.length)dyn.push('New words you can build with “'+lab(just)+'”: '+nw.join(', ')+'.');
       let pv=0;for(const x of FREQ)if(x.c.includes(j))pv+=x.f;dyn.push('The sound “'+lab(just)+'” is in '+pc(pv)+' of the words people use every day.')}
     if(ok>=.01){
@@ -341,12 +340,12 @@ function rBuild(){
   }else{
     const want=bw.ids[bw.pos];
     const en=id=>{if(bw.done)return false;if(bw.diff=='hard')return true;if(bw.diff=='easy')return canon(id)==canon(want);return bw.ids.some(x=>canon(x)==canon(id))};
-    h+=`<div class="card"><div class="bigw">${esc(bw.word)}</div><div class="slots">${bw.ids.map((id,i)=>`<span class="slot ${i<bw.pos?'ok':(i==bw.pos&&!bw.done?'cur':'')}">${i<bw.pos?lab(bw.got[i]):'?'}</span>`).join('')}</div>
+    h+=`<div class="card"><div class="bigw">${esc(bw.word)}</div><div class="slots">${bw.ids.map((id,i)=>`<span class="slot ${i<bw.pos?'ok':(i==bw.pos&&!bw.done?'cur':'')}">${i<bw.pos?lab(bw.ids[i]):'?'}</span>`).join('')}</div>
     <div class="msg" style="text-align:center">${bw.done?'':esc(bw.msg||'Press the sounds in order.')}</div>
     ${bw.guess?'<div class="msg" style="text-align:center;opacity:.7">I wasn’t sure how this word sounds, so this is a best guess.</div>':''}
     <div class="row" style="justify-content:center"><button class="b" data-bwhear>Hear the word</button><button class="b" data-bwreset>Start over</button><button class="b" data-bwnew>New word</button></div></div>`;
     if(bw.done){const st=bw.mist==0?3:bw.mist<=2?2:1;h+=`<div class="card" style="text-align:center"><div class="big" style="font-size:56px">${'⭐'.repeat(st)}</div><b>${st==3?'Perfect!':st==2?'Nice work!':'You did it!'}</b><div class="msg">${bw.mist?bw.mist+(bw.mist==1?' wrong press':' wrong presses'):'No wrong presses.'}</div><div class="row" style="justify-content:center"><button class="b" data-bwagain>Hear it blended</button><button class="b p" data-bwnew>New word</button></div></div>`}
-    h+=`<div class="grid">${S.filter(r=>r[0]!='schwa').map(r=>{const id=r[0],c=P.includes(id)?'k3':'aeiou'.includes(id)?'k2':'k1';return `<div class="g"><button class="tile ${c} ${bw.bad==id?'bad':''}" data-bwp="${id}" ${en(id)?'':'disabled'}>${r[1]}<small>${r[3]}</small></button></div>`}).join('')}</div>`;
+    h+=`<div class="grid">${S.map(r=>{const id=r[0],c=P.includes(id)?'k3':'aeiou'.includes(id)?'k2':'k1';return `<div class="g"><button class="tile ${c} ${bw.bad==id?'bad':''}" data-bwp="${id}" ${en(id)?'':'disabled'}>${r[1]}<small>${r[3]}</small></button></div>`}).join('')}</div>`;
   }
   app.innerHTML=h;
   if(!bw.started&&!bw.word){const i=$('#bwi');if(i)setTimeout(()=>i.focus(),50)}
