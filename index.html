@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sound Board">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#EAF2FB">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Sound Board</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EAF2FB;--ink:#1B2340;--card:#fff;--line:#c4d2e6;--c1:#FFC93C;--c2:#FF7A9A;--c3:#3CC8B8;--tk:#1B2340;--acc:#3B4BDB;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#141a30;--ink:#EEF2FF;--card:#1f2747;--line:#33406b;--acc:#9aa6ff}}
+:root[data-theme="dark"]{--bg:#141a30;--ink:#EEF2FF;--card:#1f2747;--line:#33406b;--acc:#9aa6ff}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Baloo 2',ui-rounded,'SF Pro Rounded',system-ui,sans-serif;font-size:18px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#app{max-width:900px;margin:0 auto;padding:12px 16px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+h1{font-size:30px;margin:6px 0}
+h2{margin:8px 0}
+nav{display:flex;gap:8px}
+button{font:inherit;color:var(--ink);cursor:pointer}
+.b{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px 16px;font-weight:700;min-height:44px}
+.b.p{background:var(--acc);border-color:var(--acc);color:#fff}
+:root[data-theme="dark"] .b.p{color:#141a30}
+.tabs{display:flex;gap:8px;margin:10px 0 16px}
+.tabs .b{flex:1;font-size:20px}
+.tabs .on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:12px}
+.tile{position:relative;min-height:92px;border:0;border-radius:22px;color:var(--tk);font-size:40px;font-weight:700;box-shadow:0 6px 0 rgba(0,0,0,.22);touch-action:manipulation;transition:transform .06s,box-shadow .06s}
+.tile:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.22)}
+.tile small{display:block;font-size:13px;font-weight:500;line-height:1}
+.k1{background:var(--c1)}.k2{background:var(--c2)}.k3{background:var(--c3)}
+.tile i{position:absolute;right:9px;top:8px;width:9px;height:9px;border-radius:50%;background:var(--tk);opacity:.45}
+.tile.on{outline:4px solid var(--ink)}
+.tile.no{opacity:.45}
+.card{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:16px;margin:12px 0}
+.big{font-size:84px;font-weight:700;text-align:center;line-height:1.1}
+.word{text-align:center;opacity:.75;margin-bottom:8px}
+canvas{width:100%;height:110px;background:var(--bg);border-radius:14px;display:block}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.trim{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.trim label{font-size:15px}.trim input{width:100%}
+.msg{min-height:1.4em;margin:4px 0;font-size:16px}
+.sheet{position:fixed;inset:0;background:rgba(10,15,40,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.sheet>div{background:var(--card);width:100%;max-width:600px;border-radius:28px 28px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px))}
+.sheet .tile{width:100%;margin:0 0 14px;font-size:34px;display:flex;align-items:center;justify-content:center;gap:12px}
+.warn{border-color:#d33;color:var(--ink)}
+.sw{display:flex;align-items:center;gap:12px;justify-content:space-between}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+</style></head><body>
+<div id="app"></div>
+<script>
+const S=`b|b|buh|ball;d|d|duh|dog;f|f|fuh|fan;g|g|guh|goat;h|h|huh|hat;j|j|juh|jam;k|k|kuh|kite;l|l|luh|leg;m|m|muh|mop;n|n|nuh|nut;p|p|puh|pig;r|r|ruh|red;s|s|suh|sun;t|t|tuh|top;v|v|vuh|van;w|w|wuh|web;y|y|yuh|yes;z|z|zuh|zip;a|a|ah|apple;e|e|eh|egg;i|i|ih|igloo;o|o|ah|octopus;u|u|uh|umbrella;ch|ch|chuh|chip;sh|sh|shuh|ship;th|th|thuh|thin;dh|th|thuh|this;zh|zh|zhuh|vision;ng|ng|ing|ring;ay|ai|A|rain;ee|ee|E|bee;igh|igh|eye|night;oh|oa|oh|boat;ooL|oo|ooh|moon;ooS|oo|uh|book;ar|ar|are|car;or|or|or|fork;air|air|air|chair;ur|ur|err|bird;ow|ow|ow|cow;oi|oi|oy|coin;ear|ear|ear|deer;ure|ure|your|pure;schwa|ə|uh|about`.split(';').map(x=>x.split('|'));
+const SD={};S.forEach(r=>SD[r[0]]=r);
+const P=S.slice(24).map(r=>r[0]);
+const L={a:'a:apple,ay:acorn,ar:arm',b:'b:ball',c:'k:cat,s:city',d:'d:dog',e:'e:egg,ee:me',f:'f:fan',g:'g:goat,j:giant',h:'h:hat',i:'i:igloo,igh:ice',j:'j:jam',k:'k:kite',l:'l:leg',m:'m:mop',n:'n:nut',o:'o:octopus,oh:open,or:for',p:'p:pig',q:'k+w:queen',r:'r:red',s:'s:sun,z:is',t:'t:top',u:'u:umbrella,ooS:put',v:'v:van',w:'w:web',x:'k+s:box',y:'y:yes,ee:happy,igh:sky',z:'z:zip'};
+const PR={ch:'ch:chip,k:school,sh:chef',sh:'sh:ship',th:'th:thin,dh:this',wh:'w:whale',ph:'f:phone',gh:'g:ghost,f:laugh',ck:'k:duck',ng:'ng:ring',nk:'ng+k:bank',qu:'k+w:queen',kn:'n:knee',wr:'r:write',gn:'n:gnat',mb:'m:lamb',tch:'ch:match',dge:'j:badge',si:'zh:vision',ai:'ay:rain',ay:'ay:play',ee:'ee:bee',ea:'ee:eat,e:bread,ay:steak',oa:'oh:boat',ow:'ow:cow,oh:snow',oo:'ooL:moon,ooS:book',ou:'ow:out,ooL:soup',oi:'oi:coin',oy:'oi:boy',au:'or:haul',aw:'or:saw',ie:'igh:pie,ee:field',igh:'igh:night',ew:'ooL:new',ue:'ooL:blue',ar:'ar:car',or:'or:fork',er:'ur:her',ir:'ur:bird',ur:'ur:fur',air:'air:chair',ear:'ear:deer,air:bear,ur:learn'};
+const M=Object.assign({},L,PR);
+const lab=id=>id.split('+').map(p=>SD[p][1]).join('');
+const $=document.querySelector.bind(document), app=$('#app');
+let bufs={},cfg={done:false,sys:false},view='main',tab='l',step=-1,sel=null,ctx=null,mem=new Map(),confirmReset=false;
+
+/* storage */
+const dbp=()=>new Promise((res,rej)=>{try{const r=indexedDB.open('soundboard',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}});
+async function kv(op,k,v){try{const d=await dbp();return await new Promise((res,rej)=>{const t=d.transaction('kv','readwrite').objectStore('kv');const q=op=='get'?t.get(k):op=='set'?t.put(v,k):t.delete(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}catch(e){if(op=='get')return mem.get(k);if(op=='set')mem.set(k,v);else mem.delete(k)}}
+const saveCfg=()=>kv('set','cfg',cfg);
+
+/* audio */
+const ac=()=>{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();if(ctx.state=='suspended')ctx.resume();return ctx};
+function src(b,o=0,d){const A=ac(),s=A.createBufferSource();s.buffer=b;s.connect(A.destination);s.start(0,o,d)}
+function one(p){if(bufs[p])src(bufs[p]);else if(cfg.sys&&window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(SD[p][2]);u.rate=.7;speechSynthesis.speak(u)}}
+const play=id=>id.split('+').forEach((p,i)=>setTimeout(()=>one(p),i*450));
+const has=id=>id.split('+').every(p=>bufs[p]||cfg.sys);
+function wav(b){const d=b.getChannelData(0),n=d.length,v=new DataView(new ArrayBuffer(44+n*2)),w=(o,s)=>[...s].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,b.sampleRate,true);v.setUint32(28,b.sampleRate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);for(let i=0;i<n;i++){const x=Math.max(-1,Math.min(1,d[i]));v.setInt16(44+i*2,x<0?x*32768:x*32767,true)}return v.buffer}
+function slice(b,s,e){const a=Math.floor(s*b.length),z=Math.max(a+1,Math.floor(e*b.length)),o=ac().createBuffer(1,z-a,b.sampleRate);o.getChannelData(0).set(b.getChannelData(0).subarray(a,z));return o}
+function autoTrim(b){const d=b.getChannelData(0);let pk=0;for(let i=0;i<d.length;i+=16)pk=Math.max(pk,Math.abs(d[i]));const t=Math.max(.02,pk*.08),pad=b.sampleRate*.03;let f=0,l=d.length-1;while(f<l&&Math.abs(d[f])<t)f++;while(l>f&&Math.abs(d[l])<t)l--;return[Math.max(0,f-pad)/d.length,Math.min(d.length,l+pad)/d.length]}
+
+/* editor for one sound */
+function mountEditor(el,id,after){
+  const sd=SD[id];let raw=bufs[id]||null,s=0,e=1,mr=null;
+  el.innerHTML=`<div class="big">${sd[1]}</div><div class="word">as in “${sd[3]}”</div><canvas width="700" height="110"></canvas>
+  <div class="trim"><label>Start<input type="range" min="0" max="100" value="0" id="rs"></label><label>End<input type="range" min="0" max="100" value="100" id="re"></label></div>
+  <div class="row"><button class="b p" id="rc">Record</button><button class="b" id="pl">Play</button><button class="b" id="sv">Save trim</button><button class="b" id="im">Import audio</button><input type="file" id="fi" accept="audio/*" hidden><button class="b" id="dl">Delete</button></div><div class="msg"></div>`;
+  const q=x=>el.querySelector(x),msg=t=>q('.msg').textContent=t,cv=q('canvas'),g=cv.getContext('2d');
+  function draw(){g.clearRect(0,0,700,110);if(!raw){g.fillStyle='#8884';g.font='20px sans-serif';g.fillText('No recording yet',20,60);return}
+    const d=raw.getChannelData(0),st=Math.floor(d.length/700)||1;g.fillStyle=getComputedStyle(document.body).color;
+    for(let x=0;x<700;x++){let m=0;for(let j=0;j<st;j+=8)m=Math.max(m,Math.abs(d[x*st+j]||0));const h=Math.max(1,m*100);g.fillRect(x,55-h/2,1,h)}
+    g.fillStyle='rgba(120,120,140,.55)';g.fillRect(0,0,s*700,110);g.fillRect(e*700,0,700-e*700,110)}
+  const sync=()=>{q('#rs').value=s*100;q('#re').value=e*100;draw()};
+  q('#rs').oninput=ev=>{s=Math.min(ev.target.value/100,e-.01);draw()};
+  q('#re').oninput=ev=>{e=Math.max(ev.target.value/100,s+.01);draw()};
+  async function save(){if(!raw)return;const b=slice(raw,s,e);bufs[id]=b;await kv('set','rec:'+id,wav(b));msg('Saved ✓');after&&after()}
+  q('#rc').onclick=async()=>{
+    if(mr){mr.stop();return}
+    try{const st=await navigator.mediaDevices.getUserMedia({audio:true});const ch=[];mr=new MediaRecorder(st);mr.ondataavailable=x=>ch.push(x.data);
+      mr.onstop=async()=>{st.getTracks().forEach(t=>t.stop());mr=null;q('#rc').textContent='Re-record';try{raw=await ac().decodeAudioData(await new Blob(ch).arrayBuffer());[s,e]=autoTrim(raw);sync();await save();msg('Saved ✓ Quiet edges were trimmed. Adjust the sliders and tap Save trim if needed.')}catch(x){msg('Couldn’t read that recording. Try again.')}};
+      mr.start();q('#rc').textContent='Stop';msg('Recording… say the sound, then tap Stop.')}
+    catch(x){msg(x&&x.name=='NotFoundError'?'No microphone found on this device.':'This page can’t use the microphone here ('+(x&&x.name||'blocked')+'). Use Import audio to add a recording instead.')}};
+  q('#pl').onclick=()=>raw?src(raw,s*raw.duration,(e-s)*raw.duration):one(id);
+  q('#sv').onclick=save;
+  q('#im').onclick=()=>q('#fi').click();
+  q('#fi').onchange=async ev=>{const f=ev.target.files[0];if(!f)return;try{raw=await ac().decodeAudioData(await f.arrayBuffer());[s,e]=autoTrim(raw);sync();await save();q('#rc').textContent='Re-record';msg('Imported ✓ Quiet edges were trimmed. Adjust the sliders and tap Save trim if needed.')}catch(x){msg('Couldn’t read that file. Try an .m4a, .mp3 or .wav.')}ev.target.value=''};
+  q('#dl').onclick=async()=>{await kv('del','rec:'+id);delete bufs[id];raw=null;s=0;e=1;sync();msg('Deleted.');after&&after()};
+  if(raw)q('#rc').textContent='Re-record';draw();
+}
+
+/* views */
+const tile=(c,k,t,sub,extra='')=>`<button class="tile ${c} ${extra}" ${k}>${t}${sub?`<small>${sub}</small>`:''}</button>`;
+function rMain(){
+  let h=`<header><h1>Sound Board</h1><nav><button class="b" data-go="edit">Edit</button><button class="b" data-go="set">Settings</button></nav></header><div class="tabs"><button class="b ${tab=='l'?'on':''}" data-tab="l">Letters</button><button class="b ${tab=='p'?'on':''}" data-tab="q">Pairs</button><button class="b ${tab=='p'?'on':''}" data-tab="p">Sounds</button></div><div class="grid">`;
+  let n=0;
+  if(tab=='l')Object.keys(L).forEach(l=>{const v=L[l].split(',').map(x=>x.split(':')).filter(x=>has(x[0]));if(!v.length)return;n++;
+    h+=`<button class="tile ${'aeiou'.includes(l)?'k2':'k1'}" data-play="${v[0][0]}" ${v.length>1?`data-v="${l}"`:''}>${l.toUpperCase()}${l}${v.length>1?'<i></i>':''}</button>`});
+  else if(tab=='q')Object.keys(PR).forEach(k=>{const v=PR[k].split(',').map(x=>x.split(':')).filter(x=>has(x[0]));if(!v.length)return;n++;h+=`<button class="tile k3" data-play="${v[0][0]}" ${v.length>1?`data-v="${k}"`:''}>${k}${v.length>1?'<i></i>':''}</button>`});
+  else P.filter(has).forEach(id=>{n++;h+=tile('k3',`data-play="${id}"`,SD[id][1],SD[id][3])});
+  h+='</div>';
+  if(!n)h+=`<div class="card">No sounds here yet. Tap <b>Edit</b> to record some, or turn on the device voice in <b>Settings</b>.</div>`;
+  else if(tab!='p')h+=`<p class="msg">Press and hold a tile with a dot to pick another sound.</p>`;
+  app.innerHTML=h;
+}
+function rEdit(){
+  app.innerHTML=`<header><h1>Edit sounds</h1><nav><button class="b" data-go="main">Done</button></nav></header><p class="msg">Tap a sound, then record it. The dot shows what’s recorded.</p><div class="card" id="ed" ${sel?'':'hidden'}></div><div class="grid">${S.map(r=>`<button class="tile ${r[0]==sel?'on':''} ${SD[r[0]]&&P.includes(r[0])?'k3':'aeiou'.includes(r[0])?'k2':'k1'}" data-e="${r[0]}">${r[1]}<small>${r[3]}</small>${bufs[r[0]]?'<i></i>':''}</button>`).join('')}</div>`;
+  if(sel)mountEditor($('#ed'),sel,()=>{const t=app.querySelector(`[data-e="${sel}"]`);if(t&&!t.querySelector('i')&&bufs[sel])t.insertAdjacentHTML('beforeend','<i></i>');if(t&&!bufs[sel])t.querySelector('i')?.remove()});
+}
+function rSet(){
+  app.innerHTML=`<header><h1>Settings</h1><nav><button class="b" data-go="main">Done</button></nav></header>
+  <div class="card sw"><div><b>Use device voice</b><div class="msg">Sounds you haven’t recorded use the iPad’s built-in voice. It’s only a rough match for letter sounds.</div></div><button class="b ${cfg.sys?'p':''}" data-sys>${cfg.sys?'On':'Off'}</button></div>
+  <div class="card ${confirmReset?'warn':''}"><b>Redo setup</b><div class="msg">${confirmReset?'This deletes all your recordings and starts the welcome steps again.':'Start the recording steps over from the beginning.'}</div><div class="row">${confirmReset?'<button class="b" data-cancel>Cancel</button><button class="b p" data-reset>Delete and restart</button>':'<button class="b" data-ask>Redo setup…</button>'}</div></div>`;
+}
+function rSetup(){
+  if(step<0){app.innerHTML=`<h1>Let’s record the sounds</h1><div class="card"><p>Say each of the ${S.length} sounds in your own voice. Recordings stay on this iPad.</p><div class="row"><button class="b p" data-start>Start recording</button><button class="b" data-sysdone>Use the device voice instead</button><button class="b" data-skip>Skip for now</button></div></div>`;return}
+  const id=S[step][0];
+  app.innerHTML=`<header><h2>Sound ${step+1} of ${S.length}</h2><nav><button class="b" data-skip>Skip for now</button></nav></header><div class="card" id="ed"></div><div class="row"><button class="b" data-prev>Back</button><button class="b p" data-next>${step==S.length-1?'Finish':'Next'}</button></div>`;
+  mountEditor($('#ed'),id);
+}
+function R(){({main:rMain,edit:rEdit,set:rSet,setup:rSetup})[view]();scrollTo(0,0)}
+async function finish(sys){cfg.done=true;if(sys)cfg.sys=true;await saveCfg();view='main';R()}
+
+/* sheet for letters with several sounds */
+function openSheet(l){
+  const v=M[l].split(',').map(x=>x.split(':')).filter(x=>has(x[0]));
+  const d=document.createElement('div');d.className='sheet';
+  d.innerHTML=`<div>${v.map(x=>tile('k'+(l.length>1?3:'aeiou'.includes(l)?2:1),`data-play="${x[0]}"`,`${lab(x[0])} <small>${x[1]}</small>`)).join('')}<button class="b" style="width:100%" data-close>Close</button></div>`;
+  d.onclick=ev=>{if(ev.target==d||ev.target.closest('[data-close]'))d.remove();else{const t=ev.target.closest('[data-play]');if(t){play(t.dataset.play);setTimeout(()=>d.remove(),250)}}};
+  document.body.appendChild(d);
+}
+
+/* events */
+let lp=null,fired=false;
+app.addEventListener('pointerdown',ev=>{const t=ev.target.closest('[data-v]');fired=false;if(t)lp=setTimeout(()=>{fired=true;openSheet(t.dataset.v)},450)});
+['pointerup','pointercancel','pointerleave'].forEach(n=>app.addEventListener(n,()=>clearTimeout(lp)));
+app.addEventListener('contextmenu',ev=>{ev.preventDefault();const t=ev.target.closest('[data-v]');if(t&&!fired){fired=true;openSheet(t.dataset.v)}});
+app.addEventListener('click',async ev=>{
+  const t=ev.target.closest('button');if(!t)return;const D=t.dataset;
+  if(D.play!==undefined){if(fired){fired=false;return}play(D.play);return}
+  if(D.go){view=D.go;confirmReset=false;sel=null;R()}
+  else if(D.tab){tab=D.tab;R()}
+  else if(D.e){sel=D.e;R()}
+  else if(D.sys!==undefined){cfg.sys=!cfg.sys;await saveCfg();R()}
+  else if(D.ask!==undefined){confirmReset=true;R()}
+  else if(D.cancel!==undefined){confirmReset=false;R()}
+  else if(D.reset!==undefined){for(const r of S)await kv('del','rec:'+r[0]);bufs={};cfg.done=false;confirmReset=false;await saveCfg();step=-1;view='setup';R()}
+  else if(D.start!==undefined){step=0;R()}
+  else if(D.sysdone!==undefined)finish(true)
+  else if(D.skip!==undefined)finish(false)
+  else if(D.next!==undefined){if(step>=S.length-1)finish(false);else{step++;R()}}
+  else if(D.prev!==undefined){step=Math.max(-1,step-1);R()}
+});
+(async()=>{
+  const c=await kv('get','cfg');if(c)cfg=c;
+  for(const r of S){const ab=await kv('get','rec:'+r[0]);if(ab)try{bufs[r[0]]=await ac().decodeAudioData(ab.slice(0))}catch(e){}}
+  try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+  view=cfg.done?'main':'setup';R();
+})();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>
