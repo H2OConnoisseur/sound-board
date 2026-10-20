@@ -24,155 +24,422 @@ button{font:inherit;color:var(--ink);cursor:pointer}
 .b{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:8px 16px;font-weight:700;min-height:44px}
 .b.p{background:var(--acc);border-color:var(--acc);color:#fff}
 :root[data-theme="dark"] .b.p{color:#141a30}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .b.p{color:#141a30}}
+.bigb{font-size:26px;min-height:64px;width:100%;border-radius:20px}
 .tabs{display:flex;gap:8px;margin:10px 0 16px}
 .tabs .b{flex:1;font-size:20px}
 .tabs .on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:12px}
-.tile{position:relative;min-height:92px;border:0;border-radius:22px;color:var(--tk);font-size:40px;font-weight:700;box-shadow:0 6px 0 rgba(0,0,0,.22);touch-action:manipulation;transition:transform .06s,box-shadow .06s}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:14px 12px;align-items:start}
+.g{display:flex;flex-direction:column;gap:7px}
+.tile{position:relative;min-height:92px;border:0;border-radius:22px;color:var(--tk);font-size:40px;font-weight:700;box-shadow:0 6px 0 rgba(0,0,0,.22);touch-action:manipulation;transition:transform .06s,box-shadow .06s;width:100%}
 .tile:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.22)}
 .tile small{display:block;font-size:13px;font-weight:500;line-height:1}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{flex:1 1 44px;min-height:46px;border:0;border-radius:14px;color:var(--tk);font-size:21px;font-weight:700;box-shadow:0 3px 0 rgba(0,0,0,.2);touch-action:manipulation;filter:saturate(.75) brightness(1.07);padding:4px 6px}
+.chip:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(0,0,0,.2)}
+.chip small{display:block;font-size:11px;font-weight:500;line-height:1}
 .k1{background:var(--c1)}.k2{background:var(--c2)}.k3{background:var(--c3)}
 .tile i{position:absolute;right:9px;top:8px;width:9px;height:9px;border-radius:50%;background:var(--tk);opacity:.45}
 .tile.on{outline:4px solid var(--ink)}
-.tile.no{opacity:.45}
+.tile.ed{font-size:34px;padding:8px 4px 6px}
+.th{display:block;width:84%;height:22px;margin:5px auto 0}
 .card{background:var(--card);border:2px solid var(--line);border-radius:24px;padding:16px;margin:12px 0}
 .big{font-size:84px;font-weight:700;text-align:center;line-height:1.1}
 .word{text-align:center;opacity:.75;margin-bottom:8px}
-canvas{width:100%;height:110px;background:var(--bg);border-radius:14px;display:block}
+canvas.wv{width:100%;height:110px;background:var(--bg);border-radius:14px;display:block}
 .row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
 .trim{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
 .trim label{font-size:15px}.trim input{width:100%}
 .msg{min-height:1.4em;margin:4px 0;font-size:16px}
-.sheet{position:fixed;inset:0;background:rgba(10,15,40,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20}
-.sheet>div{background:var(--card);width:100%;max-width:600px;border-radius:28px 28px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom,0px))}
-.sheet .tile{width:100%;margin:0 0 14px;font-size:34px;display:flex;align-items:center;justify-content:center;gap:12px}
+.bar{height:10px;border-radius:6px;background:var(--line);overflow:hidden;margin:4px 0 8px}
+.bar i{display:block;height:100%;background:var(--acc)}
 .warn{border-color:#d33;color:var(--ink)}
 .sw{display:flex;align-items:center;gap:12px;justify-content:space-between}
 :focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+input[type=text],textarea{-webkit-user-select:text;user-select:text;font:inherit;font-size:22px;width:100%;box-sizing:border-box;padding:12px 14px;border-radius:14px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+textarea{min-height:92px;resize:vertical}
+.modes{margin:6px 0 10px}.modes .b{font-size:17px;padding:8px 6px}
+.lv{display:flex;flex-direction:column;gap:8px}
+.lv .b{text-align:left}.lv small{display:block;font-weight:500;font-size:14px}
+.bigw{font-size:54px;font-weight:700;text-align:center;line-height:1.15}
+.slots{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.slot{min-width:54px;height:58px;border-radius:14px;border:3px dashed var(--line);display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:700;padding:0 8px;box-sizing:border-box}
+.slot.cur{border-color:var(--acc)}
+.slot.ok{border:3px solid transparent;background:var(--c3);color:var(--tk)}
+.tile:disabled{opacity:.2;box-shadow:none;cursor:default}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+.bad{animation:shake .35s}
+.words{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.wd{display:inline-flex;flex-direction:column;align-items:center;gap:4px;border:2px solid var(--line);background:var(--card);border-radius:16px;padding:8px 10px}
+.wd.guess{border-style:dashed}
+.wd .wt{font-size:15px;opacity:.7}
+.sc{display:inline-block;min-width:28px;text-align:center;border-radius:10px;padding:1px 6px;background:var(--c1);color:var(--tk);font-weight:700;font-size:22px;margin:0 2px;transition:transform .1s}
+.sc.now{background:var(--acc);color:#fff;transform:scale(1.25)}
+.rk{margin:2px 0 10px}
+.trk{position:relative;height:12px;border-radius:8px;background:var(--line);margin:26px 18px 8px}
+.trk i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;background:linear-gradient(90deg,var(--c3),var(--c1),var(--c2));transition:width .9s ease}
+.rocket{position:absolute;top:50%;margin:-20px 0 0 -16px;transition:left .9s ease;line-height:1}
+.rocket b{display:block;font-size:32px;transform:rotate(45deg);animation:bob 1.3s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:rotate(45deg) translate(0,0)}50%{transform:rotate(45deg) translate(-2px,3px)}}
+.fact{background:var(--card);border:2px solid var(--line);border-radius:16px;padding:10px 14px;font-size:16px;min-height:2.7em}
+@media (prefers-reduced-motion:reduce){.rocket b,.bad{animation:none}.rocket,.trk i{transition:none}}
 </style></head><body>
 <div id="app"></div>
 <script>
-const S=`b|b|buh|ball;d|d|duh|dog;f|f|fuh|fan;g|g|guh|goat;h|h|huh|hat;j|j|juh|jam;k|k|kuh|kite;l|l|luh|leg;m|m|muh|mop;n|n|nuh|nut;p|p|puh|pig;r|r|ruh|red;s|s|suh|sun;t|t|tuh|top;v|v|vuh|van;w|w|wuh|web;y|y|yuh|yes;z|z|zuh|zip;a|a|ah|apple;e|e|eh|egg;i|i|ih|igloo;o|o|ah|octopus;u|u|uh|umbrella;ch|ch|chuh|chip;sh|sh|shuh|ship;th|th|thuh|thin;dh|th|thuh|this;zh|zh|zhuh|vision;ng|ng|ing|ring;ay|ai|A|rain;ee|ee|E|bee;igh|igh|eye|night;oh|oa|oh|boat;ooL|oo|ooh|moon;ooS|oo|uh|book;ar|ar|are|car;or|or|or|fork;air|air|air|chair;ur|ur|err|bird;ow|ow|ow|cow;oi|oi|oy|coin;ear|ear|ear|deer;ure|ure|your|pure;schwa|ə|uh|about`.split(';').map(x=>x.split('|'));
+/* id | label | device-voice text | example word */
+const S=`b|b|buh|ball;d|d|duh|dog;f|f|fuh|fan;g|g|guh|goat;h|h|huh|hat;j|j|juh|jam;k|k|kuh|kite;l|l|luh|leg;m|m|muh|mop;n|n|nuh|nut;p|p|puh|pig;r|r|ruh|red;s|s|suh|sun;t|t|tuh|top;v|v|vuh|van;w|w|wuh|web;y|y|yuh|yes;z|z|zuh|zip;a|a|ah|apple;e|e|eh|egg;i|i|ih|igloo;o|o|ah|octopus;u|u|uh|umbrella;ch|ch|chuh|chip;sh|sh|shuh|ship;th|th|thuh|thin;dh|th|thuh|this;zh|zh|zhuh|vision;ng|ng|ing|ring;ay|ai|A|rain;ee|ee|E|bee;igh|igh|eye|night;oh|oa|oh|boat;ooL|oo|ooh|moon;ooS|oo|uh|book;ar|ar|are|car;or|or|or|fork;air|air|air|chair;ur|ur|err|bird;ow|ow|ow|cow;oi|oi|oy|coin;ear|ear|ear|deer;ure|ure|your|pure;schwa|uh|uh|about`.split(';').map(x=>x.split('|'));
 const SD={};S.forEach(r=>SD[r[0]]=r);
-const P=S.slice(24).map(r=>r[0]);
+const NL=23; /* first 23 entries are the single letters */
+const P=S.slice(NL).map(r=>r[0]);
 const L={a:'a:apple,ay:acorn,ar:arm',b:'b:ball',c:'k:cat,s:city',d:'d:dog',e:'e:egg,ee:me',f:'f:fan',g:'g:goat,j:giant',h:'h:hat',i:'i:igloo,igh:ice',j:'j:jam',k:'k:kite',l:'l:leg',m:'m:mop',n:'n:nut',o:'o:octopus,oh:open,or:for',p:'p:pig',q:'k+w:queen',r:'r:red',s:'s:sun,z:is',t:'t:top',u:'u:umbrella,ooS:put',v:'v:van',w:'w:web',x:'k+s:box',y:'y:yes,ee:happy,igh:sky',z:'z:zip'};
 const PR={ch:'ch:chip,k:school,sh:chef',sh:'sh:ship',th:'th:thin,dh:this',wh:'w:whale',ph:'f:phone',gh:'g:ghost,f:laugh',ck:'k:duck',ng:'ng:ring',nk:'ng+k:bank',qu:'k+w:queen',kn:'n:knee',wr:'r:write',gn:'n:gnat',mb:'m:lamb',tch:'ch:match',dge:'j:badge',si:'zh:vision',ai:'ay:rain',ay:'ay:play',ee:'ee:bee',ea:'ee:eat,e:bread,ay:steak',oa:'oh:boat',ow:'ow:cow,oh:snow',oo:'ooL:moon,ooS:book',ou:'ow:out,ooL:soup',oi:'oi:coin',oy:'oi:boy',au:'or:haul',aw:'or:saw',ie:'igh:pie,ee:field',igh:'igh:night',ew:'ooL:new',ue:'ooL:blue',ar:'ar:car',or:'or:fork',er:'ur:her',ir:'ur:bird',ur:'ur:fur',air:'air:chair',ear:'ear:deer,air:bear,ur:learn'};
-const M=Object.assign({},L,PR);
 const lab=id=>id.split('+').map(p=>SD[p][1]).join('');
 const $=document.querySelector.bind(document), app=$('#app');
-let bufs={},cfg={done:false,sys:false},view='main',tab='l',step=-1,sel=null,ctx=null,mem=new Map(),confirmReset=false;
+let bufs={},cfg={done:false,sys:false,prim:{}},view='main',tab='l',step=-1,phase='start',setupList=[],lettersOnly=false,hf=false,sel=null,ctx=null,mem=new Map(),confirmReset=false,micStream=null,cardTok=0,curCap=null;
 
-/* storage */
+/* storage (same database and keys as earlier versions, so old recordings still load) */
 const dbp=()=>new Promise((res,rej)=>{try{const r=indexedDB.open('soundboard',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}});
 async function kv(op,k,v){try{const d=await dbp();return await new Promise((res,rej)=>{const t=d.transaction('kv','readwrite').objectStore('kv');const q=op=='get'?t.get(k):op=='set'?t.put(v,k):t.delete(k);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)})}catch(e){if(op=='get')return mem.get(k);if(op=='set')mem.set(k,v);else mem.delete(k)}}
 const saveCfg=()=>kv('set','cfg',cfg);
+const delClip=async id=>{await kv('del','rec:'+id);await kv('del','raw:'+id);await kv('del','trim:'+id);delete bufs[id]};
 
 /* audio */
 const ac=()=>{ctx=ctx||new(window.AudioContext||window.webkitAudioContext)();if(ctx.state=='suspended')ctx.resume();return ctx};
 function src(b,o=0,d){const A=ac(),s=A.createBufferSource();s.buffer=b;s.connect(A.destination);s.start(0,o,d)}
-function one(p){if(bufs[p])src(bufs[p]);else if(cfg.sys&&window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(SD[p][2]);u.rate=.7;speechSynthesis.speak(u)}}
+function one(p){const b=bufFor(p);if(b)src(b);else if(cfg.sys&&window.speechSynthesis){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(SD[p][2]);u.rate=.7;speechSynthesis.speak(u)}}
 const play=id=>id.split('+').forEach((p,i)=>setTimeout(()=>one(p),i*450));
-const has=id=>id.split('+').every(p=>bufs[p]||cfg.sys);
+const has=id=>id.split('+').every(p=>bufFor(p)||cfg.sys);
 function wav(b){const d=b.getChannelData(0),n=d.length,v=new DataView(new ArrayBuffer(44+n*2)),w=(o,s)=>[...s].forEach((c,i)=>v.setUint8(o+i,c.charCodeAt(0)));w(0,'RIFF');v.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);v.setUint16(22,1,true);v.setUint32(24,b.sampleRate,true);v.setUint32(28,b.sampleRate*2,true);v.setUint16(32,2,true);v.setUint16(34,16,true);w(36,'data');v.setUint32(40,n*2,true);for(let i=0;i<n;i++){const x=Math.max(-1,Math.min(1,d[i]));v.setInt16(44+i*2,x<0?x*32768:x*32767,true)}return v.buffer}
 function slice(b,s,e){const a=Math.floor(s*b.length),z=Math.max(a+1,Math.floor(e*b.length)),o=ac().createBuffer(1,z-a,b.sampleRate);o.getChannelData(0).set(b.getChannelData(0).subarray(a,z));return o}
 function autoTrim(b){const d=b.getChannelData(0);let pk=0;for(let i=0;i<d.length;i+=16)pk=Math.max(pk,Math.abs(d[i]));const t=Math.max(.02,pk*.08),pad=b.sampleRate*.03;let f=0,l=d.length-1;while(f<l&&Math.abs(d[f])<t)f++;while(l>f&&Math.abs(d[l])<t)l--;return[Math.max(0,f-pad)/d.length,Math.min(d.length,l+pad)/d.length]}
+/* keeps the untrimmed take too, so trimming can be adjusted either way later */
+async function saveClip(id,raw,s,e,withRaw=true){const b=slice(raw,s,e);bufs[id]=b;await kv('set','rec:'+id,wav(b));if(withRaw)await kv('set','raw:'+id,wav(raw));await kv('set','trim:'+id,[s,e])}
+function drawThumb(c,b){const g=c.getContext('2d'),W=c.width,H=c.height;g.clearRect(0,0,W,H);g.fillStyle='#1B2340';if(!b){g.globalAlpha=.25;g.fillRect(0,H/2-1,W,2);g.globalAlpha=1;return}const d=b.getChannelData(0),st=Math.max(1,Math.floor(d.length/W));for(let x=0;x<W;x++){let m=0;for(let j=0;j<st;j+=4)m=Math.max(m,Math.abs(d[x*st+j]||0));const h=Math.min(H,Math.max(1,m*H*1.6));g.fillRect(x,(H-h)/2,1,h)}}
+
+/* ---------- word data: fetched once from a public CDN, then kept on the device ---------- */
+const CHS='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqr'; /* one character per sound */
+const CODE={},BYCODE={};S.forEach((r,i)=>{CODE[r[0]]=CHS[i];BYCODE[CHS[i]]=r[0]});
+CODE.schwa=CODE.u; /* the two "uh" sounds count as one */
+const canon=id=>id=='schwa'?'u':id;
+const bufFor=id=>bufs[id]||(id=='u'?bufs.schwa:id=='schwa'?bufs.u:null);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const CONS={B:'b',CH:'ch',D:'d',DH:'dh',F:'f',G:'g',HH:'h',JH:'j',K:'k',L:'l',M:'m',N:'n',NG:'ng',P:'p',R:'r',S:'s',SH:'sh',T:'t',TH:'th',V:'v',W:'w',Y:'y',Z:'z',ZH:'zh'};
+const V1={AA:'o',AE:'a',AH:'u',AO:'or',AW:'ow',AY:'igh',EH:'e',EY:'ay',IH:'i',IY:'ee',OW:'oh',OY:'oi',UH:'ooS',UW:'ooL',ER:'ur'};
+const VR={AA:'ar',AO:'or',EH:'air',IH:'ear',UH:'ure'};
+function arpa2ids(p){const t=p.split(' ').map(x=>x.replace(/[0-9]/g,'')),o=[];for(let i=0;i<t.length;i++){const x=t[i],nx=t[i+1],nn=t[i+2];if(VR[x]&&nx=='R'&&(!nn||!(nn in V1))){o.push(VR[x]);i++}else if(V1[x])o.push(V1[x]);else if(CONS[x])o.push(CONS[x]);else return[]}return o}
+const LONG={a:'ay',e:'ee',i:'igh',o:'oh',u:'ooL'},G3=['tch','dge','igh','air','ear'],G2=['ch','sh','th','ph','wh','ck','ng','qu','kn','wr','gn','mb','ai','ay','ee','ea','oa','ow','oo','ou','oi','oy','au','aw','ie','ew','ue','ar','or','er','ir','ur'];
+const firstOf=(map,k)=>map[k].split(',')[0].split(':')[0];
+/* spelling-rule guess for words that aren't in the dictionary */
+function g2p(word){let w=word.toLowerCase().replace(/[^a-z]/g,''),long=-1;if(w.length>2&&/[aeiou][^aeiouy]e$/.test(w)){long=w.length-3;w=w.slice(0,-1)}
+  const o=[];for(let i=0;i<w.length;){const c=w[i];if(i===long){o.push(LONG[c]);i++;continue}let k=null;for(const g of G3)if(w.startsWith(g,i)){k=g;break}if(!k)for(const g of G2)if(w.startsWith(g,i)){k=g;break}
+    if(k){o.push(...firstOf(PR,k).split('+'));i+=k.length;continue}
+    if(i>0&&c===w[i-1]&&!'aeiou'.includes(c)){i++;continue}
+    if(c=='y'&&i==w.length-1&&w.length>2){o.push('ee');i++;continue}
+    if(L[c])o.push(...firstOf(L,c).split('+'));i++}return o}
+let DICT=null,FREQ=null,dataP=null,dataState='idle';
+function wordIds(raw){const w=raw.toLowerCase().replace(/[^a-z']/g,'').replace(/^'+|'+$/g,'');if(!w)return{ids:[],guess:false};
+  const c=DICT&&DICT.get(w);if(c)return{ids:[...c].map(ch=>BYCODE[ch]),guess:false};
+  const m=w.match(/^(.*)'s$/);if(m&&DICT&&DICT.get(m[1])){const ids=[...DICT.get(m[1])].map(ch=>BYCODE[ch]);ids.push(['p','t','k','f','th'].includes(ids[ids.length-1])?'s':'z');return{ids,guess:false}}
+  return{ids:g2p(w),guess:true}}
+function buildFreq(list){FREQ=[];let tot=0;list.forEach((w,i)=>{const c=DICT.get(w);if(c){const f=1/(i+1);tot+=f;FREQ.push({w,c,f})}});FREQ.forEach(x=>x.f/=tot)}
+function loadData(){
+  if(dataP)return dataP;dataState='loading';
+  dataP=(async()=>{
+    try{
+      let dt=await kv('get','dict2');
+      if(!dt){const m=await import('https://cdn.jsdelivr.net/npm/cmu-pronouncing-dictionary@3.0.0/index.js'),lines=[];
+        for(const w in m.dictionary){if(!/^[a-z']+$/.test(w))continue;const ids=arpa2ids(m.dictionary[w]);if(ids.length)lines.push(w+' '+ids.map(i=>CODE[i]).join(''))}
+        dt=lines.join('\n');await kv('set','dict2',dt)}
+      DICT=new Map();for(const l of dt.split('\n')){const i=l.indexOf(' ');if(i>0)DICT.set(l.slice(0,i),l.slice(i+1))}
+      dataState='ready';
+      try{let fq=await kv('get','freq2');if(!fq){const r=await fetch('https://cdn.jsdelivr.net/gh/first20hours/google-10000-english@master/google-10000-english-no-swears.txt');if(!r.ok)throw 0;fq=await r.text();await kv('set','freq2',fq)}
+        buildFreq(fq.split('\n').map(x=>x.trim().toLowerCase()).filter(Boolean))}catch(e){}
+    }catch(e){dataState='error';dataP=null}
+    if(view=='setup'&&phase=='card')refreshFact();
+  })();
+  return dataP;
+}
+/* ---------- rocket facts ---------- */
+const TRIV=['English has about 44 sounds but only 26 letters, so some sounds need two letters together, like “sh”.','The “uh” sound is the most common sound in English. It hides in words like “about” and “banana”.','“th” makes two different sounds: a soft one in “thin” and a buzzy one in “this”.','The letters c, q and x don’t have sounds of their own. They borrow from k, s and “kw”.','“e” is the most common letter in English words.','Blending is sliding sounds together to make a word. You’re collecting the building blocks right now!','The letters “ough” can be said many ways: though, through, tough, cough, thought.'];
+let lastRec=null,factTick=0,lastPct=0;
+const recSet=()=>{const s=new Set();for(const id in bufs)s.add(CODE[id]);return s};
+const canBuild=(set,x)=>{for(let i=0;i<x.c.length;i++)if(!set.has(x.c[i]))return false;return true};
+const pc=x=>x<.005?'less than 1%':'about '+Math.round(x*100)+'%';
+function factText(just){
+  const set=recSet(),dyn=[];
+  if(FREQ&&set.size){
+    let ok=0;for(const x of FREQ)if(canBuild(set,x))ok+=x.f;
+    if(just){const j=CODE[just],set2=new Set(set);set2.delete(j);const nw=[];for(const x of FREQ){if(nw.length>=3)break;if(x.w.length>1&&x.c.includes(j)&&canBuild(set,x))nw.push(x.w)}
+      if(nw.length)dyn.push('New words you can build with “'+lab(just)+'”: '+nw.join(', ')+'.');
+      let pv=0;for(const x of FREQ)if(x.c.includes(j))pv+=x.f;dyn.push('The sound “'+lab(just)+'” is in '+pc(pv)+' of the words people use every day.')}
+    if(ok>=.01){
+      dyn.push('With your sounds so far, you can sound out '+pc(ok)+' of the words people use every day.');
+      const top=FREQ.slice(0,1000);let k=0;for(const x of top)if(canBuild(set,x))k++;dyn.push('You can now build '+k+' of the '+top.length+' most common words.');
+      if(ok<.99)dyn.push(pc(1-ok)+' of everyday words still need a sound you haven’t recorded yet.');
+    }else dyn.push('Keep going! Each new sound unlocks more words.');
+  }else if(!set.size)dyn.push('Record your first sound to start your rocket!');
+  const all=[...dyn,TRIV[factTick%TRIV.length]];return all[factTick++%all.length];
+}
+function rocketHTML(){return `<div class="rk"><div class="trk"><i id="rkf" style="width:${lastPct}%"></i><span class="rocket" id="rkr" style="left:${lastPct}%"><b>🚀</b></span></div><div class="fact" id="fact">${esc(factText(lastRec))}</div></div>`}
+function rocketGo(p){requestAnimationFrame(()=>requestAnimationFrame(()=>{const f=$('#rkf'),r=$('#rkr');if(f)f.style.width=p+'%';if(r)r.style.left=p+'%'}));lastPct=p}
+function refreshFact(){const f=$('#fact');if(f)f.textContent=factText(lastRec)}
+/* ---------- play a run of sounds one after another ---------- */
+let seqS=[],seqT=[];
+function stopSeq(){seqS.forEach(s=>{try{s.stop()}catch(e){}});seqT.forEach(clearTimeout);seqS=[];seqT=[]}
+function seqPlay(items,onStep,onEnd){stopSeq();const A=ac();let t=A.currentTime+.08;
+  items.forEach(it=>{const b=bufFor(it.id);if(!b)return;const s=A.createBufferSource();s.buffer=b;s.connect(A.destination);s.start(t);seqS.push(s);const at=t;seqT.push(setTimeout(()=>onStep&&onStep(it.tag),Math.max(0,(at-A.currentTime)*1000)));t+=b.duration+it.gap});
+  seqT.push(setTimeout(()=>onEnd&&onEnd(),Math.max(0,(t-A.currentTime)*1000)))}
+
+/* microphone: one stream, stops by itself when the speaker pauses */
+async function getMic(){if(micStream&&micStream.active)return micStream;micStream=await navigator.mediaDevices.getUserMedia({audio:true});return micStream}
+function stopMic(){if(micStream){micStream.getTracks().forEach(t=>t.stop());micStream=null}}
+const micMsg=x=>x&&x.name=='NotFoundError'?'No microphone found on this device.':'The microphone isn’t available ('+(x&&x.name||'blocked')+'). In Safari, tap aA, then Website Settings, then Microphone, then Allow.';
+async function startCapture(auto){
+  const st=await getMic(),A=ac(),node=A.createMediaStreamSource(st),an=A.createAnalyser();an.fftSize=1024;node.connect(an);
+  const ch=[],mr=new MediaRecorder(st);mr.ondataavailable=x=>{if(x.data&&x.data.size)ch.push(x.data)};
+  let stopped=false,reason='manual',tm=null;
+  const done=new Promise(res=>{mr.onstop=async()=>{clearInterval(tm);try{node.disconnect()}catch(e){}let buf=null;if(ch.length){try{buf=await A.decodeAudioData(await new Blob(ch).arrayBuffer())}catch(e){}}res({buf,reason})}});
+  function stop(r){if(stopped)return;stopped=true;if(r)reason=r;if(mr.state!='inactive')mr.stop()}
+  const d=new Float32Array(an.fftSize),t0=Date.now(),fl=[];let thr=.025,run=0,quiet=0,spoke=false;
+  tm=setInterval(()=>{an.getFloatTimeDomainData(d);let r=0;for(let i=0;i<d.length;i++)r+=d[i]*d[i];r=Math.sqrt(r/d.length);const el=Date.now()-t0;
+    if(el<400){fl.push(r);if(el>=350)thr=Math.min(.06,Math.max(.02,fl.reduce((a,b)=>a+b,0)/fl.length*3.5));return}
+    if(!auto)return;
+    if(r>thr){run++;quiet=0;if(run>=2)spoke=true}else{run=0;if(spoke)quiet+=50}
+    if(spoke&&quiet>=900)stop('auto');else if(!spoke&&el>10000)stop('silent');else if(el>8000)stop('auto')},50);
+  mr.start();
+  return{stop:()=>stop(),done};
+}
 
 /* editor for one sound */
 function mountEditor(el,id,after){
-  const sd=SD[id];let raw=bufs[id]||null,s=0,e=1,mr=null;
-  el.innerHTML=`<div class="big">${sd[1]}</div><div class="word">as in “${sd[3]}”</div><canvas width="700" height="110"></canvas>
+  const sd=SD[id];let raw=bufs[id]||null,s=0,e=1,cap=null,dirty=false,tmr=null;
+  el.innerHTML=`<div class="big">${sd[1]}</div><div class="word">as in “${sd[3]}”</div><canvas class="wv" width="700" height="110"></canvas>
   <div class="trim"><label>Start<input type="range" min="0" max="100" value="0" id="rs"></label><label>End<input type="range" min="0" max="100" value="100" id="re"></label></div>
-  <div class="row"><button class="b p" id="rc">Record</button><button class="b" id="pl">Play</button><button class="b" id="sv">Save trim</button><button class="b" id="im">Import audio</button><input type="file" id="fi" accept="audio/*" hidden><button class="b" id="dl">Delete</button></div><div class="msg"></div>`;
-  const q=x=>el.querySelector(x),msg=t=>q('.msg').textContent=t,cv=q('canvas'),g=cv.getContext('2d');
+  <div class="row"><button class="b p" id="rc">Record</button><button class="b" id="pl">Play</button><button class="b" id="at">Auto-trim</button><button class="b" id="im">Import audio</button><input type="file" id="fi" accept="audio/*" hidden><button class="b" id="dl">Delete</button></div><div class="msg"></div>`;
+  const q=x=>el.querySelector(x),msg=t=>q('.msg').textContent=t,g=q('canvas').getContext('2d');
   function draw(){g.clearRect(0,0,700,110);if(!raw){g.fillStyle='#8884';g.font='20px sans-serif';g.fillText('No recording yet',20,60);return}
     const d=raw.getChannelData(0),st=Math.floor(d.length/700)||1;g.fillStyle=getComputedStyle(document.body).color;
     for(let x=0;x<700;x++){let m=0;for(let j=0;j<st;j+=8)m=Math.max(m,Math.abs(d[x*st+j]||0));const h=Math.max(1,m*100);g.fillRect(x,55-h/2,1,h)}
     g.fillStyle='rgba(120,120,140,.55)';g.fillRect(0,0,s*700,110);g.fillRect(e*700,0,700-e*700,110)}
   const sync=()=>{q('#rs').value=s*100;q('#re').value=e*100;draw()};
-  q('#rs').oninput=ev=>{s=Math.min(ev.target.value/100,e-.01);draw()};
-  q('#re').oninput=ev=>{e=Math.max(ev.target.value/100,s+.01);draw()};
-  async function save(){if(!raw)return;const b=slice(raw,s,e);bufs[id]=b;await kv('set','rec:'+id,wav(b));msg('Saved ✓');after&&after()}
+  async function save(){if(!raw)return;await saveClip(id,raw,s,e,dirty);dirty=false;msg('Saved ✓');after&&after()}
+  const later=()=>{clearTimeout(tmr);msg('Saving…');tmr=setTimeout(save,350)};
+  q('#rs').oninput=ev=>{s=Math.min(ev.target.value/100,e-.01);draw();later()};
+  q('#re').oninput=ev=>{e=Math.max(ev.target.value/100,s+.01);draw();later()};
+  q('#at').onclick=()=>{if(!raw)return;[s,e]=autoTrim(raw);sync();save()};
   q('#rc').onclick=async()=>{
-    if(mr){mr.stop();return}
-    try{const st=await navigator.mediaDevices.getUserMedia({audio:true});const ch=[];mr=new MediaRecorder(st);mr.ondataavailable=x=>ch.push(x.data);
-      mr.onstop=async()=>{st.getTracks().forEach(t=>t.stop());mr=null;q('#rc').textContent='Re-record';try{raw=await ac().decodeAudioData(await new Blob(ch).arrayBuffer());[s,e]=autoTrim(raw);sync();await save();msg('Saved ✓ Quiet edges were trimmed. Adjust the sliders and tap Save trim if needed.')}catch(x){msg('Couldn’t read that recording. Try again.')}};
-      mr.start();q('#rc').textContent='Stop';msg('Recording… say the sound, then tap Stop.')}
-    catch(x){msg(x&&x.name=='NotFoundError'?'No microphone found on this device.':'This page can’t use the microphone here ('+(x&&x.name||'blocked')+'). Use Import audio to add a recording instead.')}};
+    if(cap){cap.stop();return}
+    try{cap=await startCapture(true);q('#rc').textContent='Stop';msg('Listening… say the sound. It stops by itself after a pause.');
+      const r=await cap.done;cap=null;q('#rc').textContent='Re-record';
+      if(r.reason=='silent'){msg('Didn’t hear anything. Tap Record and try again.');return}
+      if(!r.buf){msg('Couldn’t read that recording. Try again.');return}
+      raw=r.buf;dirty=true;[s,e]=autoTrim(raw);sync();await save();msg('Saved ✓ Quiet edges were trimmed. Drag the sliders to adjust; changes save by themselves.')}
+    catch(x){cap=null;q('#rc').textContent='Record';msg(micMsg(x)+' You can also use Import audio.')}};
   q('#pl').onclick=()=>raw?src(raw,s*raw.duration,(e-s)*raw.duration):one(id);
-  q('#sv').onclick=save;
   q('#im').onclick=()=>q('#fi').click();
-  q('#fi').onchange=async ev=>{const f=ev.target.files[0];if(!f)return;try{raw=await ac().decodeAudioData(await f.arrayBuffer());[s,e]=autoTrim(raw);sync();await save();q('#rc').textContent='Re-record';msg('Imported ✓ Quiet edges were trimmed. Adjust the sliders and tap Save trim if needed.')}catch(x){msg('Couldn’t read that file. Try an .m4a, .mp3 or .wav.')}ev.target.value=''};
-  q('#dl').onclick=async()=>{await kv('del','rec:'+id);delete bufs[id];raw=null;s=0;e=1;sync();msg('Deleted.');after&&after()};
-  if(raw)q('#rc').textContent='Re-record';draw();
+  q('#fi').onchange=async ev=>{const f=ev.target.files[0];if(!f)return;try{raw=await ac().decodeAudioData(await f.arrayBuffer());dirty=true;[s,e]=autoTrim(raw);sync();await save();q('#rc').textContent='Re-record';msg('Imported ✓ Quiet edges were trimmed. Drag the sliders to adjust.')}catch(x){msg('Couldn’t read that file. Try an .m4a, .mp3 or .wav.')}ev.target.value=''};
+  q('#dl').onclick=async()=>{clearTimeout(tmr);await delClip(id);raw=null;s=0;e=1;sync();q('#rc').textContent='Record';msg('Deleted.');after&&after()};
+  if(raw)q('#rc').textContent='Re-record';
+  draw();
+  /* load the untrimmed take and saved trim, if there is one */
+  (async()=>{const rb=await kv('get','raw:'+id);if(rb){try{const b=await ac().decodeAudioData(rb.slice(0));const t=await kv('get','trim:'+id);raw=b;if(t){s=t[0];e=t[1]}sync();q('#rc').textContent='Re-record'}catch(x){}}})();
 }
 
 /* views */
 const tile=(c,k,t,sub,extra='')=>`<button class="tile ${c} ${extra}" ${k}>${t}${sub?`<small>${sub}</small>`:''}</button>`;
+function variants(key,map){const v=map[key].split(',').map(x=>x.split(':')).filter(x=>has(x[0]));const p=cfg.prim&&cfg.prim[key],i=p?v.findIndex(x=>x[0]==p):-1;if(i>0)v.unshift(v.splice(i,1)[0]);return v}
+function grp(key,map,label,cls){
+  const v=variants(key,map);if(!v.length)return '';
+  let h=`<div class="g">${tile(cls,`data-play="${v[0][0]}"`,label,v[0][1])}`;
+  if(v.length>1)h+=`<div class="chips">${v.slice(1).map(x=>`<button class="chip ${cls}" data-play="${x[0]}" data-sw="${key}|${x[0]}">${lab(x[0])}<small>${x[1]}</small></button>`).join('')}</div>`;
+  return h+'</div>';
+}
 function rMain(){
-  let h=`<header><h1>Sound Board</h1><nav><button class="b" data-go="edit">Edit</button><button class="b" data-go="set">Settings</button></nav></header><div class="tabs"><button class="b ${tab=='l'?'on':''}" data-tab="l">Letters</button><button class="b ${tab=='p'?'on':''}" data-tab="q">Pairs</button><button class="b ${tab=='p'?'on':''}" data-tab="p">Sounds</button></div><div class="grid">`;
+  let h=`<header><h1>Sound Board</h1><nav><button class="b" data-go="edit">Edit</button><button class="b" data-go="set">Settings</button></nav></header>${modes('main')}<div class="tabs"><button class="b ${tab=='l'?'on':''}" data-tab="l">Letters</button><button class="b ${tab=='q'?'on':''}" data-tab="q">Pairs</button><button class="b ${tab=='p'?'on':''}" data-tab="p">Sounds</button></div><div class="grid">`;
   let n=0;
-  if(tab=='l')Object.keys(L).forEach(l=>{const v=L[l].split(',').map(x=>x.split(':')).filter(x=>has(x[0]));if(!v.length)return;n++;
-    h+=`<button class="tile ${'aeiou'.includes(l)?'k2':'k1'}" data-play="${v[0][0]}" ${v.length>1?`data-v="${l}"`:''}>${l.toUpperCase()}${l}${v.length>1?'<i></i>':''}</button>`});
-  else if(tab=='q')Object.keys(PR).forEach(k=>{const v=PR[k].split(',').map(x=>x.split(':')).filter(x=>has(x[0]));if(!v.length)return;n++;h+=`<button class="tile k3" data-play="${v[0][0]}" ${v.length>1?`data-v="${k}"`:''}>${k}${v.length>1?'<i></i>':''}</button>`});
-  else P.filter(has).forEach(id=>{n++;h+=tile('k3',`data-play="${id}"`,SD[id][1],SD[id][3])});
+  if(tab=='l')Object.keys(L).forEach(l=>{const g=grp(l,L,l.toUpperCase()+l,'aeiou'.includes(l)?'k2':'k1');if(g){n++;h+=g}});
+  else if(tab=='q')Object.keys(PR).forEach(k=>{const g=grp(k,PR,k,'k3');if(g){n++;h+=g}});
+  else P.filter(has).forEach(id=>{n++;h+=`<div class="g">${tile('k3',`data-play="${id}"`,SD[id][1],SD[id][3])}</div>`});
   h+='</div>';
   if(!n)h+=`<div class="card">No sounds here yet. Tap <b>Edit</b> to record some, or turn on the device voice in <b>Settings</b>.</div>`;
-  else if(tab!='p')h+=`<p class="msg">Press and hold a tile with a dot to pick another sound.</p>`;
+  else if(tab!='p')h+=`<p class="msg">The small buttons under a tile are its other sounds. Press and hold a small button to make it the big one.</p>`;
   app.innerHTML=h;
 }
+function refreshTile(id){const t=app.querySelector(`[data-e="${id}"]`);if(!t)return;const c=t.querySelector('canvas');if(c)drawThumb(c,bufs[id]);const dot=t.querySelector('i');if(bufs[id]&&!dot)t.insertAdjacentHTML('beforeend','<i></i>');if(!bufs[id]&&dot)dot.remove()}
 function rEdit(){
-  app.innerHTML=`<header><h1>Edit sounds</h1><nav><button class="b" data-go="main">Done</button></nav></header><p class="msg">Tap a sound, then record it. The dot shows what’s recorded.</p><div class="card" id="ed" ${sel?'':'hidden'}></div><div class="grid">${S.map(r=>`<button class="tile ${r[0]==sel?'on':''} ${SD[r[0]]&&P.includes(r[0])?'k3':'aeiou'.includes(r[0])?'k2':'k1'}" data-e="${r[0]}">${r[1]}<small>${r[3]}</small>${bufs[r[0]]?'<i></i>':''}</button>`).join('')}</div>`;
-  if(sel)mountEditor($('#ed'),sel,()=>{const t=app.querySelector(`[data-e="${sel}"]`);if(t&&!t.querySelector('i')&&bufs[sel])t.insertAdjacentHTML('beforeend','<i></i>');if(t&&!bufs[sel])t.querySelector('i')?.remove()});
+  app.innerHTML=`<header><h1>Edit sounds</h1><nav><button class="b" data-go="main">Done</button></nav></header><p class="msg">Tap a sound to record or trim it. The waveform under each one shows its quiet edges.</p><div class="card" id="ed" ${sel?'':'hidden'}></div><div class="grid">${S.map(r=>`<div class="g"><button class="tile ed ${r[0]==sel?'on':''} ${P.includes(r[0])?'k3':'aeiou'.includes(r[0])?'k2':'k1'}" data-e="${r[0]}">${r[1]}<small>${r[3]}</small><canvas class="th" width="84" height="22" data-th="${r[0]}"></canvas>${bufs[r[0]]?'<i></i>':''}</button></div>`).join('')}</div>`;
+  app.querySelectorAll('[data-th]').forEach(c=>drawThumb(c,bufs[c.dataset.th]));
+  if(sel)mountEditor($('#ed'),sel,()=>refreshTile(sel));
 }
 function rSet(){
   app.innerHTML=`<header><h1>Settings</h1><nav><button class="b" data-go="main">Done</button></nav></header>
   <div class="card sw"><div><b>Use device voice</b><div class="msg">Sounds you haven’t recorded use the iPad’s built-in voice. It’s only a rough match for letter sounds.</div></div><button class="b ${cfg.sys?'p':''}" data-sys>${cfg.sys?'On':'Off'}</button></div>
+  <div class="card"><b>Back up recordings</b><div class="msg">Saves all your recordings to one file. Keep it somewhere safe, such as Files or iCloud Drive. If the iPad ever clears Safari’s data, restore from it.</div><div class="row"><button class="b" data-backup>Save backup file</button><button class="b" data-restore>Restore from backup</button><input type="file" id="rf" accept=".json,application/json" hidden></div><div class="msg" id="bm"></div></div>
   <div class="card ${confirmReset?'warn':''}"><b>Redo setup</b><div class="msg">${confirmReset?'This deletes all your recordings and starts the welcome steps again.':'Start the recording steps over from the beginning.'}</div><div class="row">${confirmReset?'<button class="b" data-cancel>Cancel</button><button class="b p" data-reset>Delete and restart</button>':'<button class="b" data-ask>Redo setup…</button>'}</div></div>`;
 }
-function rSetup(){
-  if(step<0){app.innerHTML=`<h1>Let’s record the sounds</h1><div class="card"><p>Say each of the ${S.length} sounds in your own voice. Recordings stay on this iPad.</p><div class="row"><button class="b p" data-start>Start recording</button><button class="b" data-sysdone>Use the device voice instead</button><button class="b" data-skip>Skip for now</button></div></div>`;return}
-  const id=S[step][0];
-  app.innerHTML=`<header><h2>Sound ${step+1} of ${S.length}</h2><nav><button class="b" data-skip>Skip for now</button></nav></header><div class="card" id="ed"></div><div class="row"><button class="b" data-prev>Back</button><button class="b p" data-next>${step==S.length-1?'Finish':'Next'}</button></div>`;
-  mountEditor($('#ed'),id);
+async function backup(){
+  const o={v:1,clips:{}};
+  for(const r of S){const ab=await kv('get','rec:'+r[0]);if(ab){let bin='';const u=new Uint8Array(ab);for(let i=0;i<u.length;i+=8192)bin+=String.fromCharCode.apply(null,u.subarray(i,i+8192));o.clips[r[0]]=btoa(bin)}}
+  const n=Object.keys(o.clips).length;if(!n){$('#bm').textContent='There are no recordings to back up yet.';return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));a.download='sound-board-backup.json';document.body.appendChild(a);a.click();a.remove();
+  $('#bm').textContent='Backup file with '+n+' recordings created.';
 }
-function R(){({main:rMain,edit:rEdit,set:rSet,setup:rSetup})[view]();scrollTo(0,0)}
-async function finish(sys){cfg.done=true;if(sys)cfg.sys=true;await saveCfg();view='main';R()}
+async function restore(file){
+  try{const o=JSON.parse(await file.text());let n=0;
+    for(const id in o.clips){if(!SD[id])continue;const bin=atob(o.clips[id]),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+      try{const b=await ac().decodeAudioData(u.buffer.slice(0));await kv('set','rec:'+id,u.buffer);await kv('del','raw:'+id);await kv('del','trim:'+id);bufs[id]=b;n++}catch(e){}}
+    if(n&&!cfg.done){cfg.done=true;await saveCfg()}
+    $('#bm').textContent=n?'Restored '+n+' recordings.':'That file has no recordings I can read.'}
+  catch(e){$('#bm').textContent='That doesn’t look like a Sound Board backup file.'}
+}
 
-/* sheet for letters with several sounds */
-function openSheet(l){
-  const v=M[l].split(',').map(x=>x.split(':')).filter(x=>has(x[0]));
-  const d=document.createElement('div');d.className='sheet';
-  d.innerHTML=`<div>${v.map(x=>tile('k'+(l.length>1?3:'aeiou'.includes(l)?2:1),`data-play="${x[0]}"`,`${lab(x[0])} <small>${x[1]}</small>`)).join('')}<button class="b" style="width:100%" data-close>Close</button></div>`;
-  d.onclick=ev=>{if(ev.target==d||ev.target.closest('[data-close]'))d.remove();else{const t=ev.target.closest('[data-play]');if(t){play(t.dataset.play);setTimeout(()=>d.remove(),250)}}};
-  document.body.appendChild(d);
+/* setup: tap once per sound; it listens, stops on a pause, saves and moves on */
+function rSetup(){
+  cardTok++;if(curCap){curCap.stop();curCap=null}
+  if(phase=='start'){app.innerHTML=`<h1>Let’s record the sounds</h1><div class="card"><p>Say each sound in your own voice. Tap Record, say the sound, then pause. It saves and moves to the next one by itself. Recordings stay on this iPad.</p><div class="row"><button class="b p bigb" data-setuplet>Start with the ${NL} letters</button></div><div class="row"><button class="b" data-setupall>Record all ${S.length} sounds</button><button class="b" data-sysdone>Use the device voice instead</button><button class="b" data-later>Skip for now</button></div><p class="msg">Pairs like “sh” and vowel sounds can wait. You can record them later from Edit.</p></div>`;loadData();return}
+  if(phase=='mid'){app.innerHTML=`<h1>Letters done!</h1>${rocketHTML()}<div class="card"><p>Next are the ${S.length-NL} pair and vowel sounds, like “sh”, “ai” and “oo”. You can do them now or come back later from Edit.</p><div class="row"><button class="b p bigb" data-startrest>Record them now</button></div><div class="row"><button class="b" data-later>Done for now</button></div></div>`;rocketGo(100);return}
+  const id=setupList[step],sd=SD[id],pct=Math.round(step/setupList.length*100);
+  app.innerHTML=`<header><h2>${step+1} of ${setupList.length}</h2><nav><button class="b" data-later>Finish later</button></nav></header>${rocketHTML()}
+  <div class="card"><div class="big">${sd[1]}</div><div class="word">as in “${sd[3]}”</div><div class="msg" id="st">${bufs[id]?'Already recorded. Tap Record to redo it, or Skip.':'Tap Record, say the sound, then pause.'}</div>
+  <div class="row"><button class="b p bigb" id="rec" data-rec>Record</button></div>
+  <div class="row"><button class="b" data-prev>Back</button>${bufs[id]?'<button class="b" data-hear>Play</button>':''}<button class="b" data-skipone>Skip</button><button class="b ${hf?'p':''}" data-hf>Hands-free: ${hf?'On':'Off'}</button></div>
+  <div class="msg">Hands-free listens for each sound by itself, so you don’t have to tap Record every time.</div></div>`;
+  rocketGo(pct);loadData();
+  if(hf){const t=cardTok;setTimeout(()=>{if(t===cardTok&&view=='setup'&&phase=='card')runCard()},600)}
+}
+async function runCard(){
+  const tok=cardTok,id=setupList[step],st=$('#st'),btn=$('#rec');if(!st||!btn)return;
+  let cap;try{cap=await startCapture(true)}catch(x){st.textContent=micMsg(x);hf=false;return}
+  if(tok!==cardTok){cap.stop();return}
+  curCap=cap;btn.textContent='Stop';st.textContent='Listening… say “'+SD[id][1]+'”.';
+  const r=await cap.done;if(curCap===cap)curCap=null;
+  if(tok!==cardTok)return;
+  btn.textContent='Record';
+  if(r.reason=='silent'){st.textContent='Didn’t hear anything. Tap Record to try again.';hf=false;return}
+  if(!r.buf){st.textContent='Couldn’t read that. Tap Record to try again.';return}
+  const[s,e]=autoTrim(r.buf);await saveClip(id,r.buf,s,e);lastRec=id;
+  if(tok!==cardTok)return;
+  st.textContent='Saved ✓';
+  setTimeout(()=>{if(tok===cardTok)advance()},700);
+}
+function advance(){if(step>=setupList.length-1){if(lettersOnly){phase='mid';R()}else finish(false)}else{step++;R()}}
+function R(){if(view!='setup'){cardTok++;if(curCap){curCap.stop();curCap=null}}if(view!='build'&&view!='read')stopSeq();({main:rMain,edit:rEdit,set:rSet,setup:rSetup,build:rBuild,read:rRead})[view]();if(view!='edit'&&view!='setup')stopMic();scrollTo(0,0)}
+async function finish(sys){cfg.done=true;if(sys)cfg.sys=true;await saveCfg();view='main';R()}
+const startList=(list,lo)=>{setupList=list.map(r=>r[0]);lettersOnly=lo;step=0;phase='card';lastPct=0;R()};
+
+/* ---------- build a word ---------- */
+const modes=a=>`<div class="tabs modes">${[['main','Sound board'],['build','Build a word'],['read','Read aloud']].map(([v,t])=>`<button class="b ${a==v?'on':''}" data-go="${v}">${t}</button>`).join('')}</div>`;
+const hdr=t=>`<header><h1>${t}</h1><nav><button class="b" data-go="edit">Edit</button><button class="b" data-go="set">Settings</button></nav></header>`;
+let bw={word:'',diff:'easy',started:false,ids:[],guess:false,pos:0,got:[],mist:0,done:false,bad:null,msg:''};
+function rBuild(){
+  let h=hdr('Sound Board')+modes('build');
+  if(!bw.started){
+    h+=`<div class="card"><b>Build a word</b><div class="msg">Type a word, pick a level, then press the sounds in the right order.</div>
+    <input id="bwi" type="text" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="Type a word, like cat" value="${esc(bw.word)}">
+    <div class="lv" style="margin-top:10px">${[['easy','Easy','Only the next sound lights up'],['mid','Medium','Pick the right sounds, in order'],['hard','Hard','Every sound is there']].map(([d,t,s])=>`<button class="b ${bw.diff==d?'p':''}" data-diff="${d}">${t}<small>${s}</small></button>`).join('')}</div>
+    <div class="row"><button class="b p bigb" data-bwstart>Start</button></div><div class="msg">${esc(bw.msg||'')}</div></div>`;
+  }else{
+    const want=bw.ids[bw.pos];
+    const en=id=>{if(bw.done)return false;if(bw.diff=='hard')return true;if(bw.diff=='easy')return canon(id)==canon(want);return bw.ids.some(x=>canon(x)==canon(id))};
+    h+=`<div class="card"><div class="bigw">${esc(bw.word)}</div><div class="slots">${bw.ids.map((id,i)=>`<span class="slot ${i<bw.pos?'ok':(i==bw.pos&&!bw.done?'cur':'')}">${i<bw.pos?lab(bw.got[i]):'?'}</span>`).join('')}</div>
+    <div class="msg" style="text-align:center">${bw.done?'':esc(bw.msg||'Press the sounds in order.')}</div>
+    ${bw.guess?'<div class="msg" style="text-align:center;opacity:.7">I wasn’t sure how this word sounds, so this is a best guess.</div>':''}
+    <div class="row" style="justify-content:center"><button class="b" data-bwhear>Hear the word</button><button class="b" data-bwreset>Start over</button><button class="b" data-bwnew>New word</button></div></div>`;
+    if(bw.done){const st=bw.mist==0?3:bw.mist<=2?2:1;h+=`<div class="card" style="text-align:center"><div class="big" style="font-size:56px">${'⭐'.repeat(st)}</div><b>${st==3?'Perfect!':st==2?'Nice work!':'You did it!'}</b><div class="msg">${bw.mist?bw.mist+(bw.mist==1?' wrong press':' wrong presses'):'No wrong presses.'}</div><div class="row" style="justify-content:center"><button class="b" data-bwagain>Hear it blended</button><button class="b p" data-bwnew>New word</button></div></div>`}
+    h+=`<div class="grid">${S.filter(r=>r[0]!='schwa').map(r=>{const id=r[0],c=P.includes(id)?'k3':'aeiou'.includes(id)?'k2':'k1';return `<div class="g"><button class="tile ${c} ${bw.bad==id?'bad':''}" data-bwp="${id}" ${en(id)?'':'disabled'}>${r[1]}<small>${r[3]}</small></button></div>`}).join('')}</div>`;
+  }
+  app.innerHTML=h;
+  if(!bw.started&&!bw.word){const i=$('#bwi');if(i)setTimeout(()=>i.focus(),50)}
+}
+async function bwStart(){
+  const w=(bw.word||'').toLowerCase().replace(/[^a-z']/g,'').replace(/^'+|'+$/g,'');
+  if(!w){bw.msg='Type a word first.';R();return}
+  if(dataState!='ready'){bw.msg='Looking up the word…';R();await loadData()}
+  const r=wordIds(w),miss=[...new Set(r.ids.filter(id=>!(bufFor(id)||cfg.sys)))];
+  if(!r.ids.length){bw.msg='I couldn’t find any sounds in that word.';R();return}
+  if(miss.length){bw.msg='Record these sounds first: '+miss.map(lab).join(', ')+'. You can do that in Edit.';R();return}
+  Object.assign(bw,{word:w,ids:r.ids,guess:r.guess,pos:0,got:[],mist:0,done:false,bad:null,msg:'',started:true});R();
+}
+function bwPress(id){
+  if(bw.done)return;play(id);
+  if(canon(id)==canon(bw.ids[bw.pos])){bw.got.push(id);bw.pos++;bw.bad=null;bw.msg='Yes!';
+    if(bw.pos>=bw.ids.length){bw.done=true;R();setTimeout(blendWord,700);return}}
+  else{bw.mist++;bw.bad=id;bw.msg='Not that one. Try again.'}
+  R();
+}
+const blendWord=()=>seqPlay(bw.ids.map(id=>({id,gap:.08,tag:null})));
+function speakWord(w){if(!window.speechSynthesis)return;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(w);u.rate=.8;speechSynthesis.speak(u)}
+/* ---------- read aloud ---------- */
+let rd={text:'',words:[],speed:'normal',msg:''};
+function rRead(){
+  let h=hdr('Sound Board')+modes('read');
+  h+=`<div class="card"><b>Read aloud</b><div class="msg">Type a sentence. It splits each word into sounds and plays them with your recordings.</div><textarea id="rdi" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="The cat sat on the mat.">${esc(rd.text)}</textarea>
+  <div class="row">${[['slow','Slow'],['normal','Normal'],['fast','Fast']].map(([s,t])=>`<button class="b ${rd.speed==s?'p':''}" data-speed="${s}">${t}</button>`).join('')}</div>
+  <div class="row"><button class="b p bigb" data-rdread>Read it</button><button class="b" data-rdstop>Stop</button></div><div class="msg">${esc(rd.msg||'')}</div></div>`;
+  if(rd.words.length)h+=`<div class="words">${rd.words.map((x,i)=>`<button class="wd ${x.guess?'guess':''}" data-rdword="${i}"><span class="wt">${esc(x.w)}</span><span>${x.ids.map((id,j)=>`<span class="sc" data-w="${i}" data-s="${j}">${lab(id)}</span>`).join('')}</span></button>`).join('')}</div><p class="msg">Tap a word to hear just that word. A dashed outline means I guessed how it sounds.</p>`;
+  app.innerHTML=h;
+}
+const GAPS={slow:[.5,1],normal:[.2,.55],fast:[.03,.35]};
+function readItems(list){const g=GAPS[rd.speed],items=[];list.forEach(([x,i])=>x.ids.forEach((id,j)=>items.push({id,gap:j==x.ids.length-1?g[1]:g[0],tag:[i,j]})));return items}
+function markNow(tag){document.querySelectorAll('.sc.now').forEach(e=>e.classList.remove('now'));if(!tag)return;const e=document.querySelector(`.sc[data-w="${tag[0]}"][data-s="${tag[1]}"]`);if(e)e.classList.add('now')}
+async function rdRead(){
+  if(!rd.text.trim()){rd.msg='Type a sentence first.';R();return}
+  if(dataState!='ready'){rd.msg='Looking up words…';R();await loadData()}
+  rd.words=(rd.text.toLowerCase().match(/[a-z']+/g)||[]).map(w=>w.replace(/^'+|'+$/g,'')).filter(Boolean).slice(0,80).map(w=>({w,...wordIds(w)}));
+  const miss=[...new Set(rd.words.flatMap(x=>x.ids).filter(id=>!bufFor(id)))];
+  rd.msg=miss.length?'These sounds aren’t recorded yet, so they’re skipped: '+miss.map(lab).join(', ')+'.':'';
+  R();seqPlay(readItems(rd.words.map((x,i)=>[x,i])),markNow,()=>markNow(null));
 }
 
 /* events */
 let lp=null,fired=false;
-app.addEventListener('pointerdown',ev=>{const t=ev.target.closest('[data-v]');fired=false;if(t)lp=setTimeout(()=>{fired=true;openSheet(t.dataset.v)},450)});
+app.addEventListener('pointerdown',ev=>{const t=ev.target.closest('[data-sw]');fired=false;if(t)lp=setTimeout(()=>{fired=true;swap(t.dataset.sw)},500)});
 ['pointerup','pointercancel','pointerleave'].forEach(n=>app.addEventListener(n,()=>clearTimeout(lp)));
-app.addEventListener('contextmenu',ev=>{ev.preventDefault();const t=ev.target.closest('[data-v]');if(t&&!fired){fired=true;openSheet(t.dataset.v)}});
+app.addEventListener('contextmenu',ev=>{ev.preventDefault();const t=ev.target.closest('[data-sw]');if(t&&!fired){fired=true;swap(t.dataset.sw)}});
+async function swap(v){const[k,id]=v.split('|');cfg.prim=cfg.prim||{};cfg.prim[k]=id;await saveCfg();R()}
+app.addEventListener('input',ev=>{if(ev.target.id=='bwi')bw.word=ev.target.value;else if(ev.target.id=='rdi')rd.text=ev.target.value});
+app.addEventListener('keydown',ev=>{if(ev.key=='Enter'&&ev.target.id=='bwi'){ev.preventDefault();bwStart()}});
+app.addEventListener('change',ev=>{if(ev.target.id=='rf'&&ev.target.files[0]){restore(ev.target.files[0]);ev.target.value=''}});
 app.addEventListener('click',async ev=>{
   const t=ev.target.closest('button');if(!t)return;const D=t.dataset;
+  try{ac()}catch(e){} /* Safari only unlocks audio from a tap */
   if(D.play!==undefined){if(fired){fired=false;return}play(D.play);return}
   if(D.go){view=D.go;confirmReset=false;sel=null;R()}
   else if(D.tab){tab=D.tab;R()}
   else if(D.e){sel=D.e;R()}
   else if(D.sys!==undefined){cfg.sys=!cfg.sys;await saveCfg();R()}
+  else if(D.backup!==undefined)backup()
+  else if(D.restore!==undefined)$('#rf').click()
   else if(D.ask!==undefined){confirmReset=true;R()}
   else if(D.cancel!==undefined){confirmReset=false;R()}
-  else if(D.reset!==undefined){for(const r of S)await kv('del','rec:'+r[0]);bufs={};cfg.done=false;confirmReset=false;await saveCfg();step=-1;view='setup';R()}
-  else if(D.start!==undefined){step=0;R()}
+  else if(D.reset!==undefined){for(const r of S)await delClip(r[0]);bufs={};cfg.done=false;confirmReset=false;await saveCfg();step=-1;phase='start';view='setup';R()}
+  else if(D.setuplet!==undefined)startList(S.slice(0,NL),true)
+  else if(D.setupall!==undefined)startList(S,false)
+  else if(D.startrest!==undefined)startList(S.slice(NL),false)
   else if(D.sysdone!==undefined)finish(true)
-  else if(D.skip!==undefined)finish(false)
-  else if(D.next!==undefined){if(step>=S.length-1)finish(false);else{step++;R()}}
-  else if(D.prev!==undefined){step=Math.max(-1,step-1);R()}
+  else if(D.later!==undefined)finish(false)
+  else if(D.rec!==undefined){if(curCap)curCap.stop();else runCard()}
+  else if(D.hf!==undefined){hf=!hf;R()}
+  else if(D.hear!==undefined)one(setupList[step])
+  else if(D.diff){bw.diff=D.diff;R()}
+  else if(D.bwstart!==undefined)bwStart()
+  else if(D.bwp)bwPress(D.bwp)
+  else if(D.bwhear!==undefined)speakWord(bw.word)
+  else if(D.bwagain!==undefined)blendWord()
+  else if(D.bwreset!==undefined){Object.assign(bw,{pos:0,got:[],mist:0,done:false,bad:null,msg:''});R()}
+  else if(D.bwnew!==undefined){Object.assign(bw,{word:'',started:false,done:false,bad:null,msg:''});R()}
+  else if(D.speed){rd.speed=D.speed;R()}
+  else if(D.rdread!==undefined)rdRead()
+  else if(D.rdstop!==undefined){stopSeq();markNow(null)}
+  else if(D.rdword!==undefined){const i=+D.rdword;seqPlay(readItems([[rd.words[i],i]]),markNow,()=>markNow(null))}
+  else if(D.skipone!==undefined)advance()
+  else if(D.prev!==undefined){if(step>0){step--;R()}else{phase='start';R()}}
 });
 (async()=>{
-  const c=await kv('get','cfg');if(c)cfg=c;
+  const c=await kv('get','cfg');if(c)cfg=Object.assign({done:false,sys:false,prim:{}},c);
   for(const r of S){const ab=await kv('get','rec:'+r[0]);if(ab)try{bufs[r[0]]=await ac().decodeAudioData(ab.slice(0))}catch(e){}}
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
-  view=cfg.done?'main':'setup';R();
+  view=cfg.done?'main':'setup';phase='start';R();
 })();
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script></body></html>
